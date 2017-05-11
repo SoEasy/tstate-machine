@@ -53,3 +53,5 @@ Icon?
 # Модули Node, логи npm
 node_modules
 npm-debug.log
+
+test/
