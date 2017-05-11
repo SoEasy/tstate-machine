@@ -1,0 +1,32 @@
+{
+  "name": "tstate-machine",
+  "version": "1.0.0",
+  "description": "TypeScript implementation of StateMachine",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SoEasy/tstate-machine.git"
+  },
+  "keywords": [
+    "statemachine",
+    "state-machine",
+    "typescript"
+  ],
+  "author": "Vladimir Sannikov",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SoEasy/tstate-machine/issues"
+  },
+  "homepage": "https://github.com/SoEasy/tstate-machine#readme",
+  "devDependencies": {
+    "lodash": "4.17.4",
+    "reflect-metadata": "0.1.10",
+    "typescript": "2.2.2"
+  }
+}

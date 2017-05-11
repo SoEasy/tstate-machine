@@ -3,6 +3,16 @@
 ## Attention
 Модуль работоспособен, но разработка еще не закончена. API менять не собираюсь
 
+## Установка
+Пакет лежит в нашем приватом резпозитории, добавьте его
+>npm set registry http://npmjs.bank24.int
+
+Установка
+>npm install --save tstate-machine
+
+Установка с гитхаба
+>npm install https://github.com/SoEasy/tstate-machine/tarball/master
+
 ## Основная информация
 Интерфейс машины состояний подсмотрен и бОльшей частью скопирован тут:
 [JS FSM](https://github.com/jakesgordon/javascript-state-machine).

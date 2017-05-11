@@ -1,1 +1,1 @@
-export { StateMachine } from './StateMachine';
+export { StateMachine } from './src/StateMachine';

@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "baseUrl": "./src",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "target": "es5",
+    "removeComments": false,
+    "noImplicitAny": false,
+    "lib": [
+      "dom",
+      "es7"
+    ]
+  },
+  "files": [
+    "index.ts"
+  ]
+}
