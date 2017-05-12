@@ -1,8 +1,8 @@
 {
   "name": "tstate-machine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "TypeScript implementation of StateMachine",
-  "main": "index.js",
+  "main": "StateMachine.js",
   "directories": {
     "test": "test"
   },
@@ -25,7 +25,16 @@
   },
   "homepage": "https://github.com/SoEasy/tstate-machine#readme",
   "devDependencies": {
+    "del": "^2.2.2",
+    "ecmarkup": "^3.9.3",
+    "gulp": "^3.9.1",
+    "gulp-emu": "^1.1.0",
+    "gulp-live-server": "0.0.30",
+    "gulp-rename": "^1.2.2",
+    "gulp-sequence": "^0.4.6",
+    "gulp-tsb": "^2.0.3",
     "lodash": "4.17.4",
+    "mocha": "^3.2.0",
     "reflect-metadata": "0.1.10",
     "typescript": "2.2.2"
   }

@@ -28,7 +28,7 @@ export class StateMachine {
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
     static hide() {
-        return (target: object, key: string, descriptor: PropertyDescriptor) => {
+        return (_target: object, _key: string, descriptor: PropertyDescriptor) => {
             descriptor.enumerable = false;
             return descriptor;
         };
@@ -49,7 +49,7 @@ export class StateMachine {
      */
     @StateMachine.hide()
     private get $store(): StateMachineInnerStore {
-        let store: StateMachineInnerStore = StateMachineWeakMap.get(this);
+        let store: StateMachineInnerStore | undefined = StateMachineWeakMap.get(this);
         if (store) {
             return store;
         }
@@ -90,7 +90,7 @@ export class StateMachine {
      * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
      */
     @StateMachine.hide()
-    transitTo(targetState, ...args) {
+    transitTo(targetState: string, ...args) {
         // Проверить, что нужное состояние зарегистрировано
         const stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
         if (!stateToApply) {

@@ -1,20 +1,24 @@
 {
   "compilerOptions": {
-    "baseUrl": "./src",
+    "declaration": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "target": "es6",
     "module": "commonjs",
-    "moduleResolution": "node",
+    "newLine": "LF",
     "sourceMap": true,
-    "target": "es5",
-    "removeComments": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
     "lib": [
       "dom",
       "es7"
     ]
   },
   "files": [
-    "index.ts"
+    "src/StateMachine.ts"
   ]
 }
