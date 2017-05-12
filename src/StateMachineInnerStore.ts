@@ -94,7 +94,7 @@ export class StateMachineInnerStore {
      */
     callEnterCbs(stateName: string, args?: Array<any>): void {
         if (this.onEnterCbs[stateName]) {
-            this.onEnterCbs[stateName].forEach(cb => cb(...args));
+            this.onEnterCbs[stateName].forEach(cb => cb(...args as any));
         }
     }
 
