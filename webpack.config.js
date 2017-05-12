@@ -1,17 +1,15 @@
 var webpack = require('webpack'),
     path = require('path');
 
-var libraryName = 'tstate-machine',
+var libraryName = 'index',
     plugins = [
         new DtsBundlePlugin()
     ];
 
-var entry = {};
-entry[libraryName] = __dirname + '/src/index.ts';
-entry[libraryName + '.min'] = __dirname + '/src/index.ts';
-
 var config = {
-    entry: entry,
+    entry: {
+        index: __dirname + '/src/index.ts'
+    },
     devtool: false,
     output: {
         path: path.join(__dirname),

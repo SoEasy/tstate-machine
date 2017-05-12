@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("tstate-machine", [], factory);
+		define("index", [], factory);
 	else if(typeof exports === 'object')
-		exports["tstate-machine"] = factory();
+		exports["index"] = factory();
 	else
-		root["tstate-machine"] = factory();
+		root["index"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -17184,86 +17184,105 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const lodash_1 = __webpack_require__(0);
-const StateMachineInnerStore_1 = __webpack_require__(2);
-const StateMachineMetadata_1 = __webpack_require__(3);
+var lodash_1 = __webpack_require__(0);
+var StateMachineInnerStore_1 = __webpack_require__(2);
+var StateMachineMetadata_1 = __webpack_require__(3);
 /**
  * @description изолированное хранилище внутренней информации конкретной StateMachine
  */
-const StateMachineWeakMap = new WeakMap();
-class StateMachine {
+var StateMachineWeakMap = new WeakMap();
+var StateMachine = (function () {
+    function StateMachine() {
+    }
     /**
      * @description Служебный статический метод, генерирующий текст ошибки, сообщающей о невозможности перейти в состояние
      * @param currentState - из какого состояния не смогли перейти
      * @param stateName - в какой состяоние не смогли перейти
      * @returns string - сообщение об ошибке
      */
-    static NEXT_STATE_RESTRICTED(currentState, stateName) {
-        return `Navigate to ${stateName} restircted by 'to' argument of state ${currentState}`;
-    }
+    StateMachine.NEXT_STATE_RESTRICTED = function (currentState, stateName) {
+        return "Navigate to " + stateName + " restircted by 'to' argument of state " + currentState;
+    };
     /**
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
-    static hide() {
-        return (_target, _key, descriptor) => {
+    StateMachine.hide = function () {
+        return function (_target, _key, descriptor) {
             descriptor.enumerable = false;
             return descriptor;
         };
-    }
+    };
     /**
      * @description Служебный статичный декоратор, делает наследование состояния.
      * Название декорируемого свойства класса будет названием регистрируемого сосотояния
      * @param parentState - имя родительского сосотояния(от которого наследуемся)
      * @param to - массив/строка состояний/состояния, в которые/которое можно перейти из данного состояния.
      */
-    static extend(parentState, to = []) {
-        return (target, stateName) => StateMachineMetadata_1.StateMachineMetadata.defineMetadata(target, stateName, parentState, to);
-    }
-    /**
-     * @description Получить хранилище внутренней информации для данного экземпляра StateMachine
-     */
-    get $store() {
-        let store = StateMachineWeakMap.get(this);
-        if (store) {
+    StateMachine.extend = function (parentState, to) {
+        if (to === void 0) { to = []; }
+        return function (target, stateName) { return StateMachineMetadata_1.StateMachineMetadata.defineMetadata(target, stateName, parentState, to); };
+    };
+    Object.defineProperty(StateMachine.prototype, "$store", {
+        /**
+         * @description Получить хранилище внутренней информации для данного экземпляра StateMachine
+         */
+        get: function () {
+            var store = StateMachineWeakMap.get(this);
+            if (store) {
+                return store;
+            }
+            store = new StateMachineInnerStore_1.StateMachineInnerStore();
+            StateMachineWeakMap.set(this, store);
             return store;
-        }
-        store = new StateMachineInnerStore_1.StateMachineInnerStore();
-        StateMachineWeakMap.set(this, store);
-        return store;
-    }
-    /**
-     * @description Массив состояний, в которые можно перейти из 'initial'
-     */
-    get $next() {
-        return [];
-    }
-    /**
-     * @description Служебный метод для получения прототипа текущего экземпляра StateMachine. Нужен для извлечения метаданных
-     */
-    get selfPrototype() {
-        return Object.getPrototypeOf(this);
-    }
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateMachine.prototype, "$next", {
+        /**
+         * @description Массив состояний, в которые можно перейти из 'initial'
+         */
+        get: function () {
+            return [];
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateMachine.prototype, "selfPrototype", {
+        /**
+         * @description Служебный метод для получения прототипа текущего экземпляра StateMachine. Нужен для извлечения метаданных
+         */
+        get: function () {
+            return Object.getPrototypeOf(this);
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * @description Служебный метод для получения метаданных о состоянии stateName
      * @param stateName - название состояния
      */
-    getMetadataByName(stateName) {
+    StateMachine.prototype.getMetadataByName = function (stateName) {
         return StateMachineMetadata_1.StateMachineMetadata.getByName(this.selfPrototype, stateName);
-    }
+    };
     /**
      * @description Метод для смены состояния StateMachine в targetState.
      * Проверяет что оно зарегистрировано, что в него можно перейти из текущего состояния и если ок - переходит.
      * @param targetState - название состояния, в которое нужно перейти
      * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
      */
-    transitTo(targetState, ...args) {
+    StateMachine.prototype.transitTo = function (targetState) {
+        var args = [];
+        for (var _i = 1; _i < arguments.length; _i++) {
+            args[_i - 1] = arguments[_i];
+        }
         // Проверить, что нужное состояние зарегистрировано
-        const stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
+        var stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
         if (!stateToApply) {
             // Здесь и далее - просто напишу ошибку в консоль и выйду из метода.
             // Сделано это затем, что если метод вызвать внутри коллбэков промиса - промис словит эту ошибку и промолчит.
             // А ошибка по сути служебная, только для разработчика, что он забыл что-то описать или опечатался
-            console.error(`No state '${targetState}' for navigation registered`);
+            console.error("No state '" + targetState + "' for navigation registered");
             return;
         }
         // Проверим, что можем совершить переход в нужное состояние
@@ -17276,21 +17295,21 @@ class StateMachine {
         }
         else {
             // У других состояний допуски хранятся в их метаданных
-            const currentStateProps = this.getMetadataByName(this.$store.currentState);
-            const to = currentStateProps.to;
+            var currentStateProps = this.getMetadataByName(this.$store.currentState);
+            var to = currentStateProps.to;
             if (!to.includes(targetState)) {
                 console.error(StateMachine.NEXT_STATE_RESTRICTED(this.$store.currentState, targetState));
                 return;
             }
         }
         // Т.к. состояния не "чистые", а наследуемые - применять любое состояние буду от initial до требуемого. Использую стек, LIFO
-        const stateChain = [stateToApply];
+        var stateChain = [stateToApply];
         if (targetState !== 'initial') {
-            const targetStateProps = this.getMetadataByName(targetState);
-            let parentStateName = targetStateProps.parentState;
+            var targetStateProps = this.getMetadataByName(targetState);
+            var parentStateName = targetStateProps.parentState;
             while (parentStateName !== 'initial') {
                 stateChain.unshift(this[parentStateName]);
-                const prevStateProps = this.getMetadataByName(parentStateName);
+                var prevStateProps = this.getMetadataByName(parentStateName);
                 parentStateName = prevStateProps.parentState;
             }
         }
@@ -17299,74 +17318,79 @@ class StateMachine {
         // Применяем стек состояний
         lodash_1.merge(this, this.$store.initialState);
         while (stateChain.length) {
-            const tempState = stateChain.shift();
+            var tempState = stateChain.shift();
             lodash_1.merge(this, tempState);
         }
         // Вызвать все коллбэки при входе в состояние
         this.$store.callEnterCbs(targetState, args);
         // Записываем, что пришли в состояние
         this.$store.currentState = targetState;
-    }
+    };
     /**
      * @description Служебный метод, который обязательно вызывать в конструкторе класса-потомка
      * для создания слепка начального состояния StateMachine.
      */
-    rememberInitState() {
-        for (const key in this) {
+    StateMachine.prototype.rememberInitState = function () {
+        for (var key in this) {
             if (key !== 'constructor') {
                 this.$store.rememberInitialKey(key, this[key]);
             }
         }
-    }
+    };
     /**
      * @description Метод, регистрирующий коллбэк cb для ВХОДА в состяоние stateName
      * @param stateName - название состояния
      * @param cb - коллбэк
      */
-    onEnter(stateName, cb) {
+    StateMachine.prototype.onEnter = function (stateName, cb) {
         return this.$store.registerEnterCallback(stateName, cb);
-    }
+    };
     /**
      * @description Метод, регистрирующий коллбэк cb для ВЫХОДА из состояния stateName
      * @param stateName - название состояния
      * @param cb - коллбэк
      */
-    onLeave(stateName, cb) {
+    StateMachine.prototype.onLeave = function (stateName, cb) {
         return this.$store.registerLeaveCallback(stateName, cb);
-    }
-    /**
-     * @description Название текущего состояния StateMachine
-     */
-    get currentState() {
-        return this.$store.currentState;
-    }
+    };
+    Object.defineProperty(StateMachine.prototype, "currentState", {
+        /**
+         * @description Название текущего состояния StateMachine
+         */
+        get: function () {
+            return this.$store.currentState;
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * @description Проверка, находится-ли машина в состоянии stateName
      * @param stateName - название проверяемого состояния
      */
-    is(stateName) {
+    StateMachine.prototype.is = function (stateName) {
         return this.currentState === stateName;
-    }
+    };
     /**
      * @description Проверка что машина может перейти в состояние stateName из текущего
      * @param stateName - название целевого состояния
      * @returns {boolean}
      */
-    can(stateName) {
+    StateMachine.prototype.can = function (stateName) {
         if (this.$store.isInitialState) {
             return this.$next.includes(stateName);
         }
-        const currentStateProps = StateMachineMetadata_1.StateMachineMetadata.getByName(this.selfPrototype, this.currentState);
+        var currentStateProps = StateMachineMetadata_1.StateMachineMetadata.getByName(this.selfPrototype, this.currentState);
         return currentStateProps.to.includes(stateName);
-    }
+    };
     /**
      * @description Получить список состояний, в которые машина может перейти из текущего
      * @return {Array<string>}
      */
-    transitions() {
+    StateMachine.prototype.transitions = function () {
         return this.$store.isInitialState ? this.$next : this.getMetadataByName(this.currentState).to;
-    }
-}
+    };
+    return StateMachine;
+}());
 /**
  * @description константа с названием initial-состояния.
  * @type {string}
@@ -17450,13 +17474,13 @@ exports.StateMachine = StateMachine;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const lodash_1 = __webpack_require__(0);
+var lodash_1 = __webpack_require__(0);
 /**
  * Хранилище внутренней информации для конкретной StateMachine.
  * Все методы и свойства этого класса используются только в родительском классе StateMachine и никакие потомки сюда доступа не имеют
  */
-class StateMachineInnerStore {
-    constructor() {
+var StateMachineInnerStore = (function () {
+    function StateMachineInnerStore() {
         /**
          * @description Хранит начальное состояние машины
          */
@@ -17482,75 +17506,84 @@ class StateMachineInnerStore {
      * @param key - ключ
      * @param value - значение
      */
-    rememberInitialKey(key, value) {
+    StateMachineInnerStore.prototype.rememberInitialKey = function (key, value) {
         // Здесь важно порвать ссылки с полями машины.
         // Было this.$initialState[key] = value. Если value не был примитивом - он сохранялся, очевидно, по ссылке.
         // И в случае его изменения - он изменялся и в initialState, что влекло за собой бардак.
         // Можно было использовать _.cloneDeep после запоминания всех ключей, но разницы имхо никакой кроме порождения лишнего метода
-        const assignable = {};
+        var assignable = {};
         assignable[key] = value;
         lodash_1.merge(this.$initialState, assignable);
-    }
-    /**
-     * @description Начальное состояние машины
-     */
-    get initialState() {
-        return this.$initialState;
-    }
-    /**
-     * @description Находится-ли машина в начальном состоянии?
-     */
-    get isInitialState() {
-        return this.currentState === 'initial';
-    }
+    };
+    Object.defineProperty(StateMachineInnerStore.prototype, "initialState", {
+        /**
+         * @description Начальное состояние машины
+         */
+        get: function () {
+            return this.$initialState;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateMachineInnerStore.prototype, "isInitialState", {
+        /**
+         * @description Находится-ли машина в начальном состоянии?
+         */
+        get: function () {
+            return this.currentState === 'initial';
+        },
+        enumerable: true,
+        configurable: true
+    });
     /**
      * @description Регистрирует коллбэк cb, который вызовется при входе в состояние stateName
      * @param stateName - состояние, при входе в которое вызвать коллбэк
      * @param cb - коллбэк
      * @returns {()=>void} - функция удаления созданного коллбэка
      */
-    registerEnterCallback(stateName, cb) {
+    StateMachineInnerStore.prototype.registerEnterCallback = function (stateName, cb) {
         if (!this.onEnterCbs[stateName]) {
             this.onEnterCbs[stateName] = [];
         }
-        const stateEnterCbs = this.onEnterCbs[stateName];
+        var stateEnterCbs = this.onEnterCbs[stateName];
         stateEnterCbs.push(cb);
-        return () => stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1);
-    }
+        return function () { return stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1); };
+    };
     /**
      * @description Регистрирует коллбэк cb, который вызовется при выходе из состояния stateName.
      * @param stateName - состояние, при выходе из которого вызвать коллбэк
      * @param cb - коллбэк
      * @returns {()=>void} - функция удаления созданного коллбэка
      */
-    registerLeaveCallback(stateName, cb) {
+    StateMachineInnerStore.prototype.registerLeaveCallback = function (stateName, cb) {
         if (!this.onLeaveCbs[stateName]) {
             this.onLeaveCbs[stateName] = [];
         }
-        const stateLeaveCbs = this.onLeaveCbs[stateName];
+        var stateLeaveCbs = this.onLeaveCbs[stateName];
         stateLeaveCbs.push(cb);
-        return () => stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1);
-    }
+        return function () { return stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1); };
+    };
     /**
      * @description Вызвать все коллбэки, зарегистрированные на вход в состояние stateName
      * @param stateName - имя состояния
      * @param args - возможные аргументы, переданные при переходе в состояние. Они попадут в коллбэк
      */
-    callEnterCbs(stateName, args) {
+    StateMachineInnerStore.prototype.callEnterCbs = function (stateName, args) {
         if (this.onEnterCbs[stateName]) {
-            this.onEnterCbs[stateName].forEach(cb => cb(...args));
+            this.onEnterCbs[stateName].forEach(function (cb) { return cb.apply(void 0, args); });
         }
-    }
+    };
     /**
      * @description Вызывать все коллбэки по выходу из текущего состояния
      */
-    callLeaveCbs() {
-        const stateName = this.currentState;
+    StateMachineInnerStore.prototype.callLeaveCbs = function () {
+        var stateName = this.currentState;
         if (this.onLeaveCbs[stateName]) {
-            this.onLeaveCbs[stateName].forEach(cb => cb());
+            this.onLeaveCbs[stateName].forEach(function (cb) { return cb(); });
         }
-    }
-}
+    };
+    return StateMachineInnerStore;
+}());
 exports.StateMachineInnerStore = StateMachineInnerStore;
 
 
@@ -17561,11 +17594,13 @@ exports.StateMachineInnerStore = StateMachineInnerStore;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-const StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
+var StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
 /**
  * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
  */
-class StateMachineMetadata {
+var StateMachineMetadata = (function () {
+    function StateMachineMetadata() {
+    }
     /**
      * @description Записывает специфичные метаданные для состояния
      * @param target - Прототип класса StateMachine
@@ -17573,21 +17608,22 @@ class StateMachineMetadata {
      * @param parentState - состояние, от которого наследуемся
      * @param to - массив/название состояний, в которые/которое можем перейти
      */
-    static defineMetadata(target, stateName, parentState, to) {
+    StateMachineMetadata.defineMetadata = function (target, stateName, parentState, to) {
         Reflect.defineMetadata(StateMachineMetadataKey, {
-            parentState,
+            parentState: parentState,
             to: Array.isArray(to) ? to : [to]
         }, target, stateName);
-    }
+    };
     /**
      * @description Получение метаданных о состоянии
      * @param target - прототип класса StateMachine
      * @param name - название состояния, для которого извлекаем метаданные
      */
-    static getByName(target, name) {
+    StateMachineMetadata.getByName = function (target, name) {
         return Reflect.getMetadata(StateMachineMetadataKey, target, name);
-    }
-}
+    };
+    return StateMachineMetadata;
+}());
 exports.StateMachineMetadata = StateMachineMetadata;
 
 
