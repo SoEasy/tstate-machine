@@ -33,7 +33,7 @@ export class StateMachineInnerStore {
      * @param key - ключ
      * @param value - значение
      */
-    rememberInitialKey(key: string, value: any) {
+    rememberInitialKey(key: string, value: any): void {
         // Здесь важно порвать ссылки с полями машины.
         // Было this.$initialState[key] = value. Если value не был примитивом - он сохранялся, очевидно, по ссылке.
         // И в случае его изменения - он изменялся и в initialState, что влекло за собой бардак.
@@ -46,14 +46,14 @@ export class StateMachineInnerStore {
     /**
      * @description Начальное состояние машины
      */
-    get initialState() {
+    get initialState(): object {
         return this.$initialState;
     }
 
     /**
      * @description Находится-ли машина в начальном состоянии?
      */
-    get isInitialState() {
+    get isInitialState(): boolean {
         return this.currentState === 'initial';
     }
 

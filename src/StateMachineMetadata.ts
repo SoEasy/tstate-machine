@@ -14,7 +14,7 @@ export class StateMachineMetadata {
      * @param parentState - состояние, от которого наследуемся
      * @param to - массив/название состояний, в которые/которое можем перейти
      */
-    static defineMetadata(target: object, stateName: string, parentState: string, to: string | Array<string>) {
+    static defineMetadata(target: object, stateName: string, parentState: string, to: string | Array<string>): void {
         (Reflect as any).defineMetadata(StateMachineMetadataKey, {
             parentState,
             to: Array.isArray(to) ? to : [to]

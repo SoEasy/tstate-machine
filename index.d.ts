@@ -74,3 +74,7 @@ export class StateMachine {
         transitions(): string[];
 }
 
+export interface IStateDeclaration {
+    [propName: string]: any;
+}
+

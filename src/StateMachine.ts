@@ -40,7 +40,7 @@ export class StateMachine {
      * @param parentState - имя родительского сосотояния(от которого наследуемся)
      * @param to - массив/строка состояний/состояния, в которые/которое можно перейти из данного состояния.
      */
-    static extend(parentState: string, to: string | Array<string> = []) {
+    static extend(parentState: string, to: string | Array<string> = []): (target: object, stateName: string) => void {
         return (target: object, stateName: string) => StateMachineMetadata.defineMetadata(target, stateName, parentState, to);
     }
 
