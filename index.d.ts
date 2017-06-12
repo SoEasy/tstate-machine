@@ -16,7 +16,7 @@ export class StateMachine {
         /**
             * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
             */
-        static hide(): (_target: object, _key: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+        static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => object;
         /**
             * @description Служебный статичный декоратор, делает наследование состояния.
             * Название декорируемого свойства класса будет названием регистрируемого сосотояния
@@ -34,7 +34,7 @@ export class StateMachine {
             * @param targetState - название состояния, в которое нужно перейти
             * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
             */
-        transitTo(targetState: string, ...args: any[]): void;
+        transitTo(targetState: string, ...args: Array<any>): void;
         /**
             * @description Служебный метод, который обязательно вызывать в конструкторе класса-потомка
             * для создания слепка начального состояния StateMachine.
@@ -71,7 +71,7 @@ export class StateMachine {
             * @description Получить список состояний, в которые машина может перейти из текущего
             * @return {Array<string>}
             */
-        transitions(): string[];
+        transitions(): Array<string>;
 }
 
 export interface IStateDeclaration {

@@ -17443,26 +17443,26 @@ __decorate([
 ], StateMachine.prototype, "onLeave", null);
 __decorate([
     StateMachine.hide(),
-    __metadata("design:type", Object),
+    __metadata("design:type", String),
     __metadata("design:paramtypes", [])
 ], StateMachine.prototype, "currentState", null);
 __decorate([
     StateMachine.hide(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Boolean)
 ], StateMachine.prototype, "is", null);
 __decorate([
     StateMachine.hide(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Boolean)
 ], StateMachine.prototype, "can", null);
 __decorate([
     StateMachine.hide(),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", []),
-    __metadata("design:returntype", void 0)
+    __metadata("design:returntype", Array)
 ], StateMachine.prototype, "transitions", null);
 exports.StateMachine = StateMachine;
 

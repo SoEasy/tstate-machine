@@ -11,7 +11,8 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint-code": "node_modules/.bin/tslint -c ./tslint.json -p ./tsconfig.json --type-check"
+    "lint-code": "node_modules/.bin/tslint -c ./tslint.json -p ./tsconfig.json --type-check",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
