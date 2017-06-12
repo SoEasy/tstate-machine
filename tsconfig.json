@@ -18,6 +18,7 @@
       "es7"
     ]
   },
+  "baseUrl": "./src",
   "files": [
     "src/StateMachine.ts"
   ]

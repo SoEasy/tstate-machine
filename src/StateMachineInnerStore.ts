@@ -13,13 +13,13 @@ export class StateMachineInnerStore {
     /**
      * @description Название текущего состояния машины. Начальное - initial
      */
-    public currentState = 'initial';
+    public currentState: string = 'initial';
 
     /**
      * @description - key-value-хранилище коллбэков, которые будут работать при ВХОДЕ в состояние.
      * Ключ - название состояния. Значение - массив с функциями
      */
-    private onEnterCbs: Record<string, Array<(...args) => void>> = {};
+    private onEnterCbs: Record<string, Array<(...args: Array<any>) => void>> = {};
 
     /**
      * @description - key-value-хранилище коллбэков, которые будут работать при ВЫХОДЕ из состояния.
@@ -69,7 +69,7 @@ export class StateMachineInnerStore {
         }
         const stateEnterCbs: Array<() => void> = this.onEnterCbs[stateName];
         stateEnterCbs.push(cb);
-        return () => stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1);
+        return (): any => stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1);
     }
 
     /**
@@ -84,7 +84,7 @@ export class StateMachineInnerStore {
         }
         const stateLeaveCbs: Array<() => void> = this.onLeaveCbs[stateName];
         stateLeaveCbs.push(cb);
-        return () => stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1);
+        return (): any => stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1);
     }
 
     /**

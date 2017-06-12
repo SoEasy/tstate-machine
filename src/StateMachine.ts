@@ -12,7 +12,7 @@ export class StateMachine {
      * @description константа с названием initial-состояния.
      * @type {string}
      */
-    static INITIAL = 'initial';
+    static INITIAL: string = 'initial';
 
     /**
      * @description Служебный статический метод, генерирующий текст ошибки, сообщающей о невозможности перейти в состояние
@@ -20,15 +20,15 @@ export class StateMachine {
      * @param stateName - в какой состяоние не смогли перейти
      * @returns string - сообщение об ошибке
      */
-    static NEXT_STATE_RESTRICTED(currentState: string, stateName: string) {
+    static NEXT_STATE_RESTRICTED(currentState: string, stateName: string): string {
         return `Navigate to ${stateName} restircted by 'to' argument of state ${currentState}`;
     }
 
     /**
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
-    static hide() {
-        return (_target: object, _key: string, descriptor: PropertyDescriptor) => {
+    static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => object {
+        return (_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor => {
             descriptor.enumerable = false;
             return descriptor;
         };
@@ -41,7 +41,7 @@ export class StateMachine {
      * @param to - массив/строка состояний/состояния, в которые/которое можно перейти из данного состояния.
      */
     static extend(parentState: string, to: string | Array<string> = []): (target: object, stateName: string) => void {
-        return (target: object, stateName: string) => StateMachineMetadata.defineMetadata(target, stateName, parentState, to);
+        return (target: object, stateName: string): void => StateMachineMetadata.defineMetadata(target, stateName, parentState, to);
     }
 
     /**
@@ -70,7 +70,7 @@ export class StateMachine {
      * @description Служебный метод для получения прототипа текущего экземпляра StateMachine. Нужен для извлечения метаданных
      */
     @StateMachine.hide()
-    private get selfPrototype() {
+    private get selfPrototype(): any {
         return Object.getPrototypeOf(this);
     }
 
@@ -90,7 +90,7 @@ export class StateMachine {
      * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
      */
     @StateMachine.hide()
-    transitTo(targetState: string, ...args) {
+    transitTo(targetState: string, ...args: Array<any>): void {
         // Проверить, что нужное состояние зарегистрировано
         const stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
         if (!stateToApply) {
@@ -154,7 +154,7 @@ export class StateMachine {
      * для создания слепка начального состояния StateMachine.
      */
     @StateMachine.hide()
-    protected rememberInitState() {
+    protected rememberInitState(): void {
         for (const key in this) {
             if (key !== 'constructor') {
                 this.$store.rememberInitialKey(key, this[key]);
@@ -186,7 +186,7 @@ export class StateMachine {
      * @description Название текущего состояния StateMachine
      */
     @StateMachine.hide()
-    get currentState() {
+    get currentState(): string {
         return this.$store.currentState;
     }
 
@@ -195,7 +195,7 @@ export class StateMachine {
      * @param stateName - название проверяемого состояния
      */
     @StateMachine.hide()
-    is(stateName: string) {
+    is(stateName: string): boolean {
         return this.currentState === stateName;
     }
 
@@ -205,7 +205,7 @@ export class StateMachine {
      * @returns {boolean}
      */
     @StateMachine.hide()
-    can(stateName: string) {
+    can(stateName: string): boolean {
         if (this.$store.isInitialState) {
             return this.$next.includes(stateName);
         }
@@ -218,7 +218,7 @@ export class StateMachine {
      * @return {Array<string>}
      */
     @StateMachine.hide()
-    transitions() {
+    transitions(): Array<string> {
         return this.$store.isInitialState ? this.$next : this.getMetadataByName(this.currentState).to;
     }
 }

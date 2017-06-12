@@ -10,7 +10,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint-code": "node_modules/.bin/tslint -c ./tslint.json -p ./tsconfig.json --type-check"
   },
   "repository": {
     "type": "git",
@@ -28,11 +29,12 @@
   },
   "homepage": "https://github.com/SoEasy/tstate-machine#readme",
   "devDependencies": {
-    "dts-bundle": "^0.7.2",
+    "dts-bundle": "0.7.2",
     "lodash": "4.17.4",
     "reflect-metadata": "0.1.10",
-    "ts-loader": "^2.0.3",
-    "typescript": "2.2.2",
-    "webpack": "^2.5.1"
+    "tslint": "5.3.2",
+    "ts-loader": "2.1.0",
+    "typescript": "2.3.3",
+    "webpack": "2.6.1"
   }
 }
