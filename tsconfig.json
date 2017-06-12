@@ -16,9 +16,9 @@
     "lib": [
       "dom",
       "es7"
-    ]
+    ],
+    "baseUrl": "./src"
   },
-  "baseUrl": "./src",
   "files": [
     "src/StateMachine.ts"
   ]

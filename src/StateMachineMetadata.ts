@@ -1,4 +1,5 @@
 const StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
+import 'reflect-metadata';
 
 /**
  * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
