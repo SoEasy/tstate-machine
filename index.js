@@ -43,6 +43,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
 /******/
+/******/ 	// identity function for calling harmony imports with the correct context
+/******/ 	__webpack_require__.i = function(value) { return value; };
+/******/
 /******/ 	// define getter function for harmony exports
 /******/ 	__webpack_require__.d = function(exports, name, getter) {
 /******/ 		if(!__webpack_require__.o(exports, name)) {
@@ -70,7 +73,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 2);
+/******/ 	return __webpack_require__(__webpack_require__.s = 7);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -17163,7 +17166,7 @@ return /******/ (function(modules) { // webpackBootstrap
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(4)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(1), __webpack_require__(8)(module)))
 
 /***/ }),
 /* 1 */
@@ -17194,17 +17197,6 @@ module.exports = g;
 
 /***/ }),
 /* 2 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var StateMachine_1 = __webpack_require__(3);
-exports.StateMachine = StateMachine_1.StateMachine;
-
-
-/***/ }),
-/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17503,196 +17495,197 @@ exports.StateMachine = StateMachine;
 
 
 /***/ }),
-/* 4 */
+/* 3 */
 /***/ (function(module, exports) {
 
-module.exports = function(module) {
-	if(!module.webpackPolyfill) {
-		module.deprecate = function() {};
-		module.paths = [];
-		// module.parent = undefined by default
-		if(!module.children) module.children = [];
-		Object.defineProperty(module, "loaded", {
-			enumerable: true,
-			get: function() {
-				return module.l;
-			}
-		});
-		Object.defineProperty(module, "id", {
-			enumerable: true,
-			get: function() {
-				return module.i;
-			}
-		});
-		module.webpackPolyfill = 1;
-	}
-	return module;
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
 };
 
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
 
-/***/ }),
-/* 5 */
-/***/ (function(module, exports, __webpack_require__) {
+function noop() {}
 
-"use strict";
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
 
-Object.defineProperty(exports, "__esModule", { value: true });
-var lodash_1 = __webpack_require__(0);
-/**
- * Хранилище внутренней информации для конкретной StateMachine.
- * Все методы и свойства этого класса используются только в родительском классе StateMachine и никакие потомки сюда доступа не имеют
- */
-var StateMachineInnerStore = (function () {
-    function StateMachineInnerStore() {
-        /**
-         * @description Хранит начальное состояние машины
-         */
-        this.$initialState = {};
-        /**
-         * @description Название текущего состояния машины. Начальное - initial
-         */
-        this.currentState = 'initial';
-        /**
-         * @description - key-value-хранилище коллбэков, которые будут работать при ВХОДЕ в состояние.
-         * Ключ - название состояния. Значение - массив с функциями
-         */
-        this.onEnterCbs = {};
-        /**
-         * @description - key-value-хранилище коллбэков, которые будут работать при ВЫХОДЕ из состояния.
-         * Ключ - название состояния. Значение - массив с функциями
-         */
-        this.onLeaveCbs = {};
-    }
-    /**
-     * @description метод, сохраняющий начальное ключа во внутренний объект $initialState.
-     * Вызовы этого метода собирают чистое initial-состояние
-     * @param key - ключ
-     * @param value - значение
-     */
-    StateMachineInnerStore.prototype.rememberInitialKey = function (key, value) {
-        // Здесь важно порвать ссылки с полями машины.
-        // Было this.$initialState[key] = value. Если value не был примитивом - он сохранялся, очевидно, по ссылке.
-        // И в случае его изменения - он изменялся и в initialState, что влекло за собой бардак.
-        // Можно было использовать _.cloneDeep после запоминания всех ключей, но разницы имхо никакой кроме порождения лишнего метода
-        var assignable = {};
-        assignable[key] = value;
-        lodash_1.merge(this.$initialState, assignable);
-    };
-    Object.defineProperty(StateMachineInnerStore.prototype, "initialState", {
-        /**
-         * @description Начальное состояние машины
-         */
-        get: function () {
-            return this.$initialState;
-        },
-        enumerable: true,
-        configurable: true
-    });
-    Object.defineProperty(StateMachineInnerStore.prototype, "isInitialState", {
-        /**
-         * @description Находится-ли машина в начальном состоянии?
-         */
-        get: function () {
-            return this.currentState === 'initial';
-        },
-        enumerable: true,
-        configurable: true
-    });
-    /**
-     * @description Регистрирует коллбэк cb, который вызовется при входе в состояние stateName
-     * @param stateName - состояние, при входе в которое вызвать коллбэк
-     * @param cb - коллбэк
-     * @returns {()=>void} - функция удаления созданного коллбэка
-     */
-    StateMachineInnerStore.prototype.registerEnterCallback = function (stateName, cb) {
-        if (!this.onEnterCbs[stateName]) {
-            this.onEnterCbs[stateName] = [];
-        }
-        var stateEnterCbs = this.onEnterCbs[stateName];
-        stateEnterCbs.push(cb);
-        return function () { return stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1); };
-    };
-    /**
-     * @description Регистрирует коллбэк cb, который вызовется при выходе из состояния stateName.
-     * @param stateName - состояние, при выходе из которого вызвать коллбэк
-     * @param cb - коллбэк
-     * @returns {()=>void} - функция удаления созданного коллбэка
-     */
-    StateMachineInnerStore.prototype.registerLeaveCallback = function (stateName, cb) {
-        if (!this.onLeaveCbs[stateName]) {
-            this.onLeaveCbs[stateName] = [];
-        }
-        var stateLeaveCbs = this.onLeaveCbs[stateName];
-        stateLeaveCbs.push(cb);
-        return function () { return stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1); };
-    };
-    /**
-     * @description Вызвать все коллбэки, зарегистрированные на вход в состояние stateName
-     * @param stateName - имя состояния
-     * @param args - возможные аргументы, переданные при переходе в состояние. Они попадут в коллбэк
-     */
-    StateMachineInnerStore.prototype.callEnterCbs = function (stateName, args) {
-        if (this.onEnterCbs[stateName]) {
-            this.onEnterCbs[stateName].forEach(function (cb) { return cb.apply(void 0, args); });
-        }
-    };
-    /**
-     * @description Вызывать все коллбэки по выходу из текущего состояния
-     */
-    StateMachineInnerStore.prototype.callLeaveCbs = function () {
-        var stateName = this.currentState;
-        if (this.onLeaveCbs[stateName]) {
-            this.onLeaveCbs[stateName].forEach(function (cb) { return cb(); });
-        }
-    };
-    return StateMachineInnerStore;
-}());
-exports.StateMachineInnerStore = StateMachineInnerStore;
+process.listeners = function (name) { return [] }
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 6 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-var StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
-__webpack_require__(7);
-/**
- * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
- */
-var StateMachineMetadata = (function () {
-    function StateMachineMetadata() {
-    }
-    /**
-     * @description Записывает специфичные метаданные для состояния
-     * @param target - Прототип класса StateMachine
-     * @param stateName - название переменной, в которой описано состояние. По совместительству - название состояния
-     * @param parentState - состояние, от которого наследуемся
-     * @param to - массив/название состояний, в которые/которое можем перейти
-     */
-    StateMachineMetadata.defineMetadata = function (target, stateName, parentState, to) {
-        Reflect.defineMetadata(StateMachineMetadataKey, {
-            parentState: parentState,
-            to: Array.isArray(to) ? to : [to]
-        }, target, stateName);
-    };
-    /**
-     * @description Получение метаданных о состоянии
-     * @param target - прототип класса StateMachine
-     * @param name - название состояния, для которого извлекаем метаданные
-     */
-    StateMachineMetadata.getByName = function (target, name) {
-        return Reflect.getMetadata(StateMachineMetadataKey, target, name);
-    };
-    return StateMachineMetadata;
-}());
-exports.StateMachineMetadata = StateMachineMetadata;
-
-
-/***/ }),
-/* 7 */
+/* 4 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(process, global) {/*! *****************************************************************************
@@ -18820,196 +18813,206 @@ var Reflect;
             Function("return this;")());
 })(Reflect || (Reflect = {}));
 //# sourceMappingURL=Reflect.js.map
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(1)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(3), __webpack_require__(1)))
+
+/***/ }),
+/* 5 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var lodash_1 = __webpack_require__(0);
+/**
+ * Хранилище внутренней информации для конкретной StateMachine.
+ * Все методы и свойства этого класса используются только в родительском классе StateMachine и никакие потомки сюда доступа не имеют
+ */
+var StateMachineInnerStore = (function () {
+    function StateMachineInnerStore() {
+        /**
+         * @description Хранит начальное состояние машины
+         */
+        this.$initialState = {};
+        /**
+         * @description Название текущего состояния машины. Начальное - initial
+         */
+        this.currentState = 'initial';
+        /**
+         * @description - key-value-хранилище коллбэков, которые будут работать при ВХОДЕ в состояние.
+         * Ключ - название состояния. Значение - массив с функциями
+         */
+        this.onEnterCbs = {};
+        /**
+         * @description - key-value-хранилище коллбэков, которые будут работать при ВЫХОДЕ из состояния.
+         * Ключ - название состояния. Значение - массив с функциями
+         */
+        this.onLeaveCbs = {};
+    }
+    /**
+     * @description метод, сохраняющий начальное ключа во внутренний объект $initialState.
+     * Вызовы этого метода собирают чистое initial-состояние
+     * @param key - ключ
+     * @param value - значение
+     */
+    StateMachineInnerStore.prototype.rememberInitialKey = function (key, value) {
+        // Здесь важно порвать ссылки с полями машины.
+        // Было this.$initialState[key] = value. Если value не был примитивом - он сохранялся, очевидно, по ссылке.
+        // И в случае его изменения - он изменялся и в initialState, что влекло за собой бардак.
+        // Можно было использовать _.cloneDeep после запоминания всех ключей, но разницы имхо никакой кроме порождения лишнего метода
+        var assignable = {};
+        assignable[key] = value;
+        lodash_1.merge(this.$initialState, assignable);
+    };
+    Object.defineProperty(StateMachineInnerStore.prototype, "initialState", {
+        /**
+         * @description Начальное состояние машины
+         */
+        get: function () {
+            return this.$initialState;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(StateMachineInnerStore.prototype, "isInitialState", {
+        /**
+         * @description Находится-ли машина в начальном состоянии?
+         */
+        get: function () {
+            return this.currentState === 'initial';
+        },
+        enumerable: true,
+        configurable: true
+    });
+    /**
+     * @description Регистрирует коллбэк cb, который вызовется при входе в состояние stateName
+     * @param stateName - состояние, при входе в которое вызвать коллбэк
+     * @param cb - коллбэк
+     * @returns {()=>void} - функция удаления созданного коллбэка
+     */
+    StateMachineInnerStore.prototype.registerEnterCallback = function (stateName, cb) {
+        if (!this.onEnterCbs[stateName]) {
+            this.onEnterCbs[stateName] = [];
+        }
+        var stateEnterCbs = this.onEnterCbs[stateName];
+        stateEnterCbs.push(cb);
+        return function () { return stateEnterCbs.splice(stateEnterCbs.indexOf(cb), 1); };
+    };
+    /**
+     * @description Регистрирует коллбэк cb, который вызовется при выходе из состояния stateName.
+     * @param stateName - состояние, при выходе из которого вызвать коллбэк
+     * @param cb - коллбэк
+     * @returns {()=>void} - функция удаления созданного коллбэка
+     */
+    StateMachineInnerStore.prototype.registerLeaveCallback = function (stateName, cb) {
+        if (!this.onLeaveCbs[stateName]) {
+            this.onLeaveCbs[stateName] = [];
+        }
+        var stateLeaveCbs = this.onLeaveCbs[stateName];
+        stateLeaveCbs.push(cb);
+        return function () { return stateLeaveCbs.splice(stateLeaveCbs.indexOf(cb), 1); };
+    };
+    /**
+     * @description Вызвать все коллбэки, зарегистрированные на вход в состояние stateName
+     * @param stateName - имя состояния
+     * @param args - возможные аргументы, переданные при переходе в состояние. Они попадут в коллбэк
+     */
+    StateMachineInnerStore.prototype.callEnterCbs = function (stateName, args) {
+        if (this.onEnterCbs[stateName]) {
+            this.onEnterCbs[stateName].forEach(function (cb) { return cb.apply(void 0, args); });
+        }
+    };
+    /**
+     * @description Вызывать все коллбэки по выходу из текущего состояния
+     */
+    StateMachineInnerStore.prototype.callLeaveCbs = function () {
+        var stateName = this.currentState;
+        if (this.onLeaveCbs[stateName]) {
+            this.onLeaveCbs[stateName].forEach(function (cb) { return cb(); });
+        }
+    };
+    return StateMachineInnerStore;
+}());
+exports.StateMachineInnerStore = StateMachineInnerStore;
+
+
+/***/ }),
+/* 6 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
+__webpack_require__(4);
+/**
+ * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
+ */
+var StateMachineMetadata = (function () {
+    function StateMachineMetadata() {
+    }
+    /**
+     * @description Записывает специфичные метаданные для состояния
+     * @param target - Прототип класса StateMachine
+     * @param stateName - название переменной, в которой описано состояние. По совместительству - название состояния
+     * @param parentState - состояние, от которого наследуемся
+     * @param to - массив/название состояний, в которые/которое можем перейти
+     */
+    StateMachineMetadata.defineMetadata = function (target, stateName, parentState, to) {
+        Reflect.defineMetadata(StateMachineMetadataKey, {
+            parentState: parentState,
+            to: Array.isArray(to) ? to : [to]
+        }, target, stateName);
+    };
+    /**
+     * @description Получение метаданных о состоянии
+     * @param target - прототип класса StateMachine
+     * @param name - название состояния, для которого извлекаем метаданные
+     */
+    StateMachineMetadata.getByName = function (target, name) {
+        return Reflect.getMetadata(StateMachineMetadataKey, target, name);
+    };
+    return StateMachineMetadata;
+}());
+exports.StateMachineMetadata = StateMachineMetadata;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StateMachine_1 = __webpack_require__(2);
+exports.StateMachine = StateMachine_1.StateMachine;
+
 
 /***/ }),
 /* 8 */
 /***/ (function(module, exports) {
 
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
 };
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-process.prependListener = noop;
-process.prependOnceListener = noop;
-
-process.listeners = function (name) { return [] }
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
 
 
 /***/ })
