@@ -30,12 +30,8 @@
   },
   "homepage": "https://github.com/SoEasy/tstate-machine#readme",
   "devDependencies": {
-    "@types/chai": "4.0.1",
-    "@types/mocha": "2.2.41",
-    "chai": "4.0.2",
     "dts-bundle": "0.7.2",
     "lodash": "4.17.4",
-    "mocha": "3.4.2",
     "reflect-metadata": "0.1.10",
     "ts-loader": "2.1.0",
     "ts-node": "3.0.6",
