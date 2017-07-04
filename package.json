@@ -10,7 +10,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node_modules/.bin/mocha -r ts-node/register test/index.ts",
+    "test": "node_modules/.bin/mocha -r ts-node/register src/test/index.ts",
     "lint-code": "node_modules/.bin/tslint -c ./tslint.json -p ./tsconfig.json --type-check",
     "build": "webpack"
   },
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/SoEasy/tstate-machine#readme",
   "devDependencies": {
-    "@types/chai": "4.0.0",
+    "@types/chai": "4.0.1",
     "@types/mocha": "2.2.41",
     "chai": "4.0.2",
     "dts-bundle": "0.7.2",

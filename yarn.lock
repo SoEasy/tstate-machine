@@ -2,9 +2,9 @@
 # yarn lockfile v1
 
 
-"@types/chai@4.0.0":
-  version "4.0.0"
-  resolved "http://npmjs.bank24.int/@types%2fchai/-/chai-4.0.0.tgz#4c9adabd2d04265769e6d9e847e86cc404dc7dcd"
+"@types/chai@4.0.1":
+  version "4.0.1"
+  resolved "http://npmjs.bank24.int/@types%2fchai/-/chai-4.0.1.tgz#37fea779617cfec3fd2b19a0247e8bbdd5133bf6"
 
 "@types/mocha@2.2.41":
   version "2.2.41"
@@ -472,17 +472,11 @@ date-now@^0.1.4:
   version "0.1.4"
   resolved "http://npmjs.bank24.int/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
 
-debug@2.6.0:
+debug@2.6.0, debug@^2.2.0:
   version "2.6.0"
   resolved "http://npmjs.bank24.int/debug/-/debug-2.6.0.tgz#bc596bcabe7617f11d9fa15361eded5608b8499b"
   dependencies:
     ms "0.7.2"
-
-debug@^2.2.0:
-  version "2.6.8"
-  resolved "http://npmjs.bank24.int/debug/-/debug-2.6.8.tgz#e731531ca2ede27d188222427da17821d68ff4fc"
-  dependencies:
-    ms "2.0.0"
 
 decamelize@^1.0.0, decamelize@^1.1.1:
   version "1.2.0"
@@ -1228,10 +1222,6 @@ ms@0.7.2:
   version "0.7.2"
   resolved "http://npmjs.bank24.int/ms/-/ms-0.7.2.tgz#ae25cf2512b3885a1d95d7f037868d8431124765"
 
-ms@2.0.0:
-  version "2.0.0"
-  resolved "http://npmjs.bank24.int/ms/-/ms-2.0.0.tgz#5608aeadfc00be6c2901df5f9861788de0d597c8"
-
 nan@^2.3.0:
   version "2.6.2"
   resolved "http://npmjs.bank24.int/nan/-/nan-2.6.2.tgz#e4ff34e6c95fdfb5aecc08de6596f43605a7db45"
@@ -1782,7 +1772,7 @@ strip-json-comments@^2.0.0, strip-json-comments@~2.0.1:
   version "2.0.1"
   resolved "http://npmjs.bank24.int/strip-json-comments/-/strip-json-comments-2.0.1.tgz#3c531942e908c2697c0ec344858c286c7ca0a60a"
 
-supports-color@3.1.2:
+supports-color@3.1.2, supports-color@^3.1.0:
   version "3.1.2"
   resolved "http://npmjs.bank24.int/supports-color/-/supports-color-3.1.2.tgz#72a262894d9d408b956ca05ff37b2ed8a6e2a2d5"
   dependencies:
@@ -1791,12 +1781,6 @@ supports-color@3.1.2:
 supports-color@^2.0.0:
   version "2.0.0"
   resolved "http://npmjs.bank24.int/supports-color/-/supports-color-2.0.0.tgz#535d045ce6b6363fa40117084629995e9df324c7"
-
-supports-color@^3.1.0:
-  version "3.2.3"
-  resolved "http://npmjs.bank24.int/supports-color/-/supports-color-3.2.3.tgz#65ac0504b3954171d8a64946b2ae3cbb8a5f54f6"
-  dependencies:
-    has-flag "^1.0.0"
 
 tapable@^0.2.5, tapable@~0.2.5:
   version "0.2.6"
