@@ -1,4 +1,4 @@
-import { IStateDeclaration, StateMachine } from '../src';
+import { IStateDeclaration, StateMachine } from '../';
 
 export const STATES = {
     LOADING_STATE: 'loadingState',
@@ -20,7 +20,7 @@ export class TestStateMachine extends StateMachine {
     };
 
     @StateMachine.extend(StateMachine.INITIAL, [STATES.MAIN_STATE])
-    loadingState: IStateDeclaration = {
+    loadingState: IStateDeclaration<TestStateMachine> = {
         loading: true
     };
 
