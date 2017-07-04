@@ -1,6 +1,6 @@
 {
   "name": "tstate-machine",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "TypeScript implementation of StateMachine",
   "types": "index.d.ts",
   "typescript": {
@@ -40,7 +40,7 @@
     "ts-loader": "2.1.0",
     "ts-node": "3.0.6",
     "tslint": "5.3.2",
-    "typescript": "2.3.3",
+    "typescript": "2.4.1",
     "webpack": "2.6.1"
   }
 }

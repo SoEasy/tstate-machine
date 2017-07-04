@@ -74,7 +74,7 @@ export class StateMachine {
         transitions(): Array<string>;
 }
 
-export interface IStateDeclaration {
-    [propName: string]: any;
-}
+export type IStateDeclaration<T> = {
+    [F in keyof T]?: T[F];
+};
 
