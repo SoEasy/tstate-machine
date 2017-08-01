@@ -45,7 +45,7 @@ export class StateMachine {
             * @param stateName - название состояния
             * @param cb - коллбэк
             */
-        onEnter(stateName: string, cb: () => void): () => void;
+        onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void;
         /**
             * @description Метод, регистрирующий коллбэк cb для ВЫХОДА из состояния stateName
             * @param stateName - название состояния

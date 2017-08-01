@@ -168,7 +168,7 @@ export class StateMachine {
      * @param cb - коллбэк
      */
     @StateMachine.hide()
-    onEnter(stateName: string, cb: () => void): () => void {
+    onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void {
         return this.$store.registerEnterCallback(stateName, cb);
     }
 
