@@ -27,7 +27,7 @@ export class StateMachine {
     /**
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
-    static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => object {
+    static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => PropertyDescriptor {
         return (_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor => {
             descriptor.enumerable = false;
             return descriptor;

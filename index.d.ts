@@ -16,7 +16,7 @@ export class StateMachine {
         /**
             * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
             */
-        static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => object;
+        static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
         /**
             * @description Служебный статичный декоратор, делает наследование состояния.
             * Название декорируемого свойства класса будет названием регистрируемого сосотояния
