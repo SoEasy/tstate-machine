@@ -20,7 +20,7 @@ export class StateMachine {
      * @param stateName - в какой состяоние не смогли перейти
      * @returns string - сообщение об ошибке
      */
-    static NEXT_STATE_RESTRICTED(currentState: string, stateName: string): string {
+    private static NEXT_STATE_RESTRICTED(currentState: string, stateName: string): string {
         return `Navigate to ${stateName} restircted by 'to' argument of state ${currentState}`;
     }
 
