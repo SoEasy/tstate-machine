@@ -43,7 +43,7 @@ class Machine extends StateMachine {
         }
     };
 
-    @StateMachine.hide()
+    @StateMachine.hide
     protected get $next(): Array<string> {
         return ['mainState'];
     }

@@ -27,11 +27,9 @@ export class StateMachine {
     /**
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
-    static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => PropertyDescriptor {
-        return (_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor => {
-            descriptor.enumerable = false;
-            return descriptor;
-        };
+    static hide(_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor {
+        descriptor.enumerable = false;
+        return descriptor;
     }
 
     /**
@@ -47,7 +45,7 @@ export class StateMachine {
     /**
      * @description Получить хранилище внутренней информации для данного экземпляра StateMachine
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     private get $store(): StateMachineInnerStore {
         let store: StateMachineInnerStore | undefined = StateMachineWeakMap.get(this);
         if (store) {
@@ -61,7 +59,7 @@ export class StateMachine {
     /**
      * @description Массив состояний, в которые можно перейти из 'initial'
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     protected get $next(): Array<string> {
         return [];
     }
@@ -69,7 +67,7 @@ export class StateMachine {
     /**
      * @description Служебный метод для получения прототипа текущего экземпляра StateMachine. Нужен для извлечения метаданных
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     private get selfPrototype(): any {
         return Object.getPrototypeOf(this);
     }
@@ -78,7 +76,7 @@ export class StateMachine {
      * @description Служебный метод для получения метаданных о состоянии stateName
      * @param stateName - название состояния
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     private getMetadataByName(stateName: string): StateMachineMetadata {
         return StateMachineMetadata.getByName(this.selfPrototype, stateName);
     }
@@ -89,7 +87,7 @@ export class StateMachine {
      * @param targetState - название состояния, в которое нужно перейти
      * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     transitTo(targetState: string, ...args: Array<any>): void {
         // Проверить, что нужное состояние зарегистрировано
         const stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
@@ -153,7 +151,7 @@ export class StateMachine {
      * @description Служебный метод, который обязательно вызывать в конструкторе класса-потомка
      * для создания слепка начального состояния StateMachine.
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     protected rememberInitState(): void {
         for (const key in this) {
             if (key !== 'constructor') {
@@ -167,7 +165,7 @@ export class StateMachine {
      * @param stateName - название состояния
      * @param cb - коллбэк
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void {
         return this.$store.registerEnterCallback(stateName, cb);
     }
@@ -177,7 +175,7 @@ export class StateMachine {
      * @param stateName - название состояния
      * @param cb - коллбэк
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     onLeave(stateName: string, cb: () => void): () => void {
         return this.$store.registerLeaveCallback(stateName, cb);
     }
@@ -185,7 +183,7 @@ export class StateMachine {
     /**
      * @description Название текущего состояния StateMachine
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     get currentState(): string {
         return this.$store.currentState;
     }
@@ -194,7 +192,7 @@ export class StateMachine {
      * @description Проверка, находится-ли машина в состоянии stateName
      * @param stateName - название проверяемого состояния
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     is(stateName: string): boolean {
         return this.currentState === stateName;
     }
@@ -204,7 +202,7 @@ export class StateMachine {
      * @param stateName - название целевого состояния
      * @returns {boolean}
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     can(stateName: string): boolean {
         if (this.$store.isInitialState) {
             return this.$next.includes(stateName);
@@ -217,7 +215,7 @@ export class StateMachine {
      * @description Получить список состояний, в которые машина может перейти из текущего
      * @return {Array<string>}
      */
-    @StateMachine.hide()
+    @StateMachine.hide
     transitions(): Array<string> {
         return this.$store.isInitialState ? this.$next : this.getMetadataByName(this.currentState).to;
     }

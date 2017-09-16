@@ -179,11 +179,9 @@ var StateMachine = (function () {
     /**
      * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
      */
-    StateMachine.hide = function () {
-        return function (_target, _key, descriptor) {
-            descriptor.enumerable = false;
-            return descriptor;
-        };
+    StateMachine.hide = function (_target, _key, descriptor) {
+        descriptor.enumerable = false;
+        return descriptor;
     };
     /**
      * @description Служебный статичный декоратор, делает наследование состояния.
@@ -368,69 +366,69 @@ var StateMachine = (function () {
      */
     StateMachine.INITIAL = 'initial';
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", StateMachineInnerStore_1.StateMachineInnerStore),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "$store", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Array),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "$next", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Object),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "selfPrototype", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", StateMachineMetadata_1.StateMachineMetadata)
     ], StateMachine.prototype, "getMetadataByName", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object]),
         __metadata("design:returntype", void 0)
     ], StateMachine.prototype, "transitTo", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", void 0)
     ], StateMachine.prototype, "rememberInitState", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Function]),
         __metadata("design:returntype", Function)
     ], StateMachine.prototype, "onEnter", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Function]),
         __metadata("design:returntype", Function)
     ], StateMachine.prototype, "onLeave", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", String),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "currentState", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Boolean)
     ], StateMachine.prototype, "is", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Boolean)
     ], StateMachine.prototype, "can", null);
     __decorate([
-        StateMachine.hide(),
+        StateMachine.hide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", Array)
