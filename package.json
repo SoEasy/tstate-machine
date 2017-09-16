@@ -34,7 +34,6 @@
     "@types/mocha": "^2.2.41",
     "chai": "4.1.1",
     "dts-bundle": "0.7.2",
-    "lodash": "4.17.4",
     "mocha": "3.5.0",
     "nyc": "11.2.1",
     "ts-loader": "2.3.2",

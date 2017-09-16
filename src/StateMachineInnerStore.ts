@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge } from './utils/merge';
 
 /**
  * Хранилище внутренней информации для конкретной StateMachine.
