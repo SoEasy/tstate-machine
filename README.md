@@ -1,5 +1,5 @@
 # tstate-machine
-[![Build Status](https://travis-ci.org/SoEasy/tstate-machine.svg?branch=1.1-dev)](https://travis-ci.org/SoEasy/tstate-machine)
+[![Build Status](https://travis-ci.org/SoEasy/tstate-machine.svg?branch=master)](https://travis-ci.org/SoEasy/tstate-machine)
 
 Реализация StateMachine на TypeScript
 
