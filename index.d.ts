@@ -7,16 +7,9 @@ export class StateMachine {
             */
         static INITIAL: string;
         /**
-            * @description Служебный статический метод, генерирующий текст ошибки, сообщающей о невозможности перейти в состояние
-            * @param currentState - из какого состояния не смогли перейти
-            * @param stateName - в какой состяоние не смогли перейти
-            * @returns string - сообщение об ошибке
-            */
-        static NEXT_STATE_RESTRICTED(currentState: string, stateName: string): string;
-        /**
             * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
             */
-        static hide(): (o: object, key: string, descriptor: PropertyDescriptor) => PropertyDescriptor;
+        static hide(_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor;
         /**
             * @description Служебный статичный декоратор, делает наследование состояния.
             * Название декорируемого свойства класса будет названием регистрируемого сосотояния

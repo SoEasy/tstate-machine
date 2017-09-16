@@ -1,4 +1,4 @@
-import { merge } from 'lodash';
+import { merge } from './utils/merge';
 
 /**
  * Хранилище внутренней информации для конкретной StateMachine.
@@ -41,6 +41,7 @@ export class StateMachineInnerStore {
         const assignable: Record<string, any> = {};
         assignable[key] = value;
         merge(this.$initialState, assignable);
+        // Object.assign(this.$initialState, assignable);  // Here initial state become as mutable! We have test for it
     }
 
     /**

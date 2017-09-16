@@ -1,4 +1,7 @@
-# Реализация StateMachine на TypeScript
+# tstate-machine
+[![Build Status](https://travis-ci.org/SoEasy/tstate-machine.svg?branch=master)](https://travis-ci.org/SoEasy/tstate-machine)
+
+Реализация StateMachine на TypeScript
 
 ## Attention
 Модуль работоспособен, но разработка еще не закончена. API менять не собираюсь

@@ -7,7 +7,7 @@
     "module": "commonjs",
     "newLine": "LF",
     "sourceMap": true,
-    "strictNullChecks": true,
+    "strictNullChecks": false,
     "noImplicitAny": false,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
@@ -17,9 +17,6 @@
       "dom",
       "es7"
     ],
-    "baseUrl": "./src"
-  },
-  "files": [
-    "src/index.ts"
-  ]
+    "baseUrl": "./"
+  }
 }
