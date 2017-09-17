@@ -1,6 +1,15 @@
 language: node_js
+
 node_js:
   - "node"
+
 cache:
   directories:
     - "node_modules"
+
+deploy:
+  provider: npm
+  email: "vhaldemario@gmail.com"
+  api_key: "secure: LOxA8ggX9CgrO3wEMEXDpI+EbUez9K23gARi8HazMUwwjXtWyPeX1O8JDgyEfed/LHknY0lcgKEd/bREeb4zHpcpPogkZ46dYgTkYiKVmvAjvivJnRsNBMtrSeemMM/WT0J3IEtQ4GJ1KOm2l1bVFRFUWAH2RiLdefalaKaxvUCDHAvjY6soBp8iLzK3DiTP4gA47HL7mCGpeWQ17rx5nmZ6faJIYGXT+l+8Is5RoBy/scvd8dv+X4rDqwzhY4MJw/ZbCBw5OMDYFUO5+znLXnE8WXgrwBJqanV+e2caXYF/ZWRPUyrZb2OlnBFZt4MR2xuBKuBl1wmTXPd7iOhVDvmWakJGTzJ352mJaB5mbIwd4qxKgQVvvNlFB8rsGakLp487hjv0z3qNnA97tiZ42ZwpcNvAwhWiDvZ7YCrZjFHPm/4T5CezYCrf+nMZhdkYG702XsPYPo/AKRFzOQJDJlrS96NfqENlPlW3jvJilRZJZlrCpZiBBpSLzZIXHMqgu1UjNTAomSKdMumnV/KUv2OMiP2vZWvpqNhYxH0X9piCCXo/4uEWbyvd3f5UYs0xdVqc1HSRA0JztFcJcrKm5GWU0meveuymX99Mic7VEyrg/ayhUQRTrM18GpuRqlQFHHHS4gvvzbAk2Zytchy9db2qH1c1UisatJTm40KogW0="
+  on:
+    branch: master
