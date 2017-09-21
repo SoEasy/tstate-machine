@@ -55,4 +55,5 @@ node_modules
 npm-debug.log
 
 test/
+sample/
 yarn.lock
