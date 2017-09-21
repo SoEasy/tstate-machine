@@ -4,7 +4,7 @@
 StateMachine implementation on TypeScript. Works fine with ES6
 
 ## Overview
-Class-based, declarative, strongly typed state machine with hard declared transitions and without autocomplete problems.
+Class-based, object-oriented, declarative, strongly typed state machine with hard declared transitions and without autocomplete problems.
 
 ## Example
 ```javascript
