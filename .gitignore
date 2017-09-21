@@ -56,3 +56,4 @@ npm-debug.log
 
 # Генерится вебпаком, TODO разобраться как избавиться от этой ненужности
 tstate-machine.*
+/.nyc_output/

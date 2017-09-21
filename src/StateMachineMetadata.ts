@@ -1,4 +1,4 @@
-const StateMachineMetadataKey = 'Tochka_StateMachineMetadata';
+const StateMachineMetadataKey = 'TStateMachineMetadata';
 
 /**
  * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
