@@ -2,68 +2,45 @@
 
 export class StateMachine {
         /**
-            * @description константа с названием initial-состояния.
+            * @description constant to store initial state name
             * @type {string}
             */
         static INITIAL: string;
         /**
-            * @description Служебный статический декоратор, прячет декорированный метод от перебора в цикле for-in
+            * @description Static service decorator for hiding property/method in for-in
             */
         static hide(_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor;
         /**
-            * @description Служебный статичный декоратор, делает наследование состояния.
-            * Название декорируемого свойства класса будет названием регистрируемого сосотояния
-            * @param parentState - имя родительского сосотояния(от которого наследуемся)
-            * @param to - массив/строка состояний/состояния, в которые/которое можно перейти из данного состояния.
+            * @description Static service decorator - make state inheritance
+            * Name of decorated property becomes as state name
+            * @param parentState - name of parent state
+            * @param to - states in which we can transit from them state
             */
         static extend(parentState: string, to?: string | Array<string>): (target: object, stateName: string) => void;
         /**
-            * @description Массив состояний, в которые можно перейти из 'initial'
+            * @description Array of states in which machine can transit from initial
             */
         protected readonly $next: Array<string>;
         /**
-            * @description Метод для смены состояния StateMachine в targetState.
-            * Проверяет что оно зарегистрировано, что в него можно перейти из текущего состояния и если ок - переходит.
-            * @param targetState - название состояния, в которое нужно перейти
-            * @param args - любые данные, которые будут проброшены в onEnter-callback при входе в состояние
+            * @description Method for transit machine to another state
+            * Check the target state is registered, check transition is possible
+            * @param targetState - name of state to transit
+            * @param args - any data for pass to onEnter callback
             */
         transitTo(targetState: string, ...args: Array<any>): void;
         /**
-            * @description Служебный метод, который обязательно вызывать в конструкторе класса-потомка
-            * для создания слепка начального состояния StateMachine.
+            * @description Service method. Required to call in constructor of child-class
+            * for create a snapshot of initial state
             */
         protected rememberInitState(): void;
-        /**
-            * @description Метод, регистрирующий коллбэк cb для ВХОДА в состяоние stateName
-            * @param stateName - название состояния
-            * @param cb - коллбэк
-            */
         onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void;
-        /**
-            * @description Метод, регистрирующий коллбэк cb для ВЫХОДА из состояния stateName
-            * @param stateName - название состояния
-            * @param cb - коллбэк
-            */
         onLeave(stateName: string, cb: () => void): () => void;
         /**
-            * @description Название текущего состояния StateMachine
+            * @description getter for current state name
             */
         readonly currentState: string;
-        /**
-            * @description Проверка, находится-ли машина в состоянии stateName
-            * @param stateName - название проверяемого состояния
-            */
         is(stateName: string): boolean;
-        /**
-            * @description Проверка что машина может перейти в состояние stateName из текущего
-            * @param stateName - название целевого состояния
-            * @returns {boolean}
-            */
         can(stateName: string): boolean;
-        /**
-            * @description Получить список состояний, в которые машина может перейти из текущего
-            * @return {Array<string>}
-            */
         transitions(): Array<string>;
 }
 

@@ -1,145 +1,208 @@
 # tstate-machine
 [![Build Status](https://travis-ci.org/SoEasy/tstate-machine.svg?branch=master)](https://travis-ci.org/SoEasy/tstate-machine)
 
-Реализация StateMachine на TypeScript
+StateMachine implementation on TypeScript. Works fine with ES6
 
-## Attention
-Модуль работоспособен, но разработка еще не закончена. API менять не собираюсь
+## Overview
+Class-based, declarative, strongly typed state machine with hard declared transitions and without autocomplete problems.
 
-## Установка
-Пакет лежит в npm
+## Example
+```javascript
+import { IStateDeclaration, StateMachine } from 'tstate-machine';
+
+class ButtonStateMachine extends StateMachine {
+    // initial state
+    text: string = 'do request';
+    diisabled: boolean = false;
+
+    // state declarations
+    // From what state we inherit and in what states we can transit
+    @StateMachine.extend(StateMachine.INTIAL, ['requestState'])
+    mainState: IStateDeclaration<ButtonStateMachine> = {}; // no changes relative to parent(initial) state
+
+    @StateMachine.extend('mainState', ['doneState'])
+    requestState: IStateDeclaration<ButtonStateMachine> = {
+        text: 'sending...',
+        disabled: true
+    };
+
+    @StateMachine.extend('requestState')
+    doneState: IStateDeclaration<ButtonStateMachine> = {
+        text: 'done'
+        // no change disabled - property inherited from requestState and has `false` value
+    };
+
+    // common but important actions
+
+    // states in which one we can transit from initial
+    @StateMachine.hide
+    protected get $next(): Array<string> {
+        return ['mainState'];
+    }
+
+    // remember initial state
+    constructor() {
+        super();
+        this.rememberInitState();
+    }
+}
+
+const machine = new TextStateMachine();
+machine.transitTo('maintState');
+machine.transitTo('requestState');
+console.log(machine.text); // autocomplete works fine!
+```
+
+## Installation
+From npm
 >npm install --save tstate-machine
 
-Установка с гитхаба
+From github
 >npm install https://github.com/SoEasy/tstate-machine/tarball/master
 
-## Основная информация
-Интерфейс машины состояний подсмотрен тут:
-[JS FSM](https://github.com/jakesgordon/javascript-state-machine).
+## How to use
 
-StateMachine представляет собой класс, от которого стоит наследовать свои классы конкретных машин.
-Все поля, которые будут описаны в вашем потомке - это начальное состояние машины.
+### Create your own StateMachine
+To create your own state machine you must create class and inherit it from `StateMachine` class.
+```javascript
+class ButtonStateMachine extends StateMachine {}
+```
 
-Главный бонус - с типизацией проблем не возникнет.
-> Важно! Всем полям класса необходимо задать начальное значение - хоть null, хоть undefined. В пртивном случае машина не запомнит эти поля из-за особенностей компиляции TypeScript
+### Fill initial state
+All declared fields in your class with their initial values will be called `StateMachine.INITIAL`.
+> Important! All of your state fields must contain any initial value: null/undefined/something.
+Otherwise your state machine will not work correctly due to the features of typescript compilation.
 
-Данная реализация StateMachine не предполагает создания независимых состояний.
-Т.е. все состояния машины либо наследуются от initial, либо от других состояний.
-Объявлять в состоянии новые поля с данными - технически можно, но не нужно.
-Объявление нового состояния должно содержать только те поля, которые отличаются от родительского.
+```javascript
+class ButtonStateMachine extends StateMachine {
+    text: string = 'do request';
+    disabled: boolean = false;
+}
+```
+Because StateMachine is made by inheritance - to remember initial values you must call method `.rememberInitState` in constructor.
+```javascript
+constructor() {
+    super(); // call constructor of StateMachine
+    this.rememberInitState(); // remember own properties as initial state
+}
+```
 
-StateMachine берет на себя контроль за переходами из состояния в состояние.
-Для этого при описании состояния в декларативном стиле описывается массив других состояний, в которые можно перейти из описываемого.
- При попытке перейти в недозволенное состояние вылетит Error с описанием откуда-куда не получилось перейти
-   
-StateMachine позволяет регистрировать коллбэки, которые будут вызваны при входе в нужное состояние и при выходе из него.
- Коллбэки, зарегистрированные для входа в состояние способны получать данные, переданные в метод перехода между состояниями.
- Коллбэки выхода из состояния, очевидно, никаких данных не принимают.
+### Declare states
+There are not independent states - every state must be inherited from the initial state or from other declared state.
+Simply, if we represent statemachine as graph - we can travel to each state from initial state by transitions.
 
-## Объяснение работы
-Основа реализации машины - метаданные, дескрипторы доступа декораторов и цикл for-in по полям объекта.
+Also with state declaration we can describe the states in which we can go.
 
-Главная идея:
-1. В конструкторе класса-потомка вызвать родительский метод `this.rememberInitState();` Который пройдет циклом по всем полям класса и запомнит их как начальное состояние
-2. В классе-потомке описать protected-геттер $next, возвращающий массив возможных состояний для перехода из начального
-3. С помощью специального декоратора `@StateMachine.extend` зарегистрировать новые состояния, описанные как объекты с изменениями. Хранить их в метаданных класса
-4. При переходе из состояния в состояние собрать цепочку наследования состояний, привести объект машины в начальное состояние и накатить на него всю цепочку изменений. *Почему так? Потому что ветвей наследования может быть несколько, и если переходить вдруг из одной в другую - чтобы не описывать все различия - проще поехать от корня дерева состояний. Опыт показывает, что развесистых графов состояния у нас не было - можно не бояться за производительность*
-5. Все методы класса оборачиваются декоратором `StateMachine.hide` - он прячет метод от попадания в итератор for-in по объекту. Это важно, чтобы методы не попадали в хранилище initial-состояния и не перезаписывались каждый раз при переходе.
+To declare the states there is static method `StateMachine.extend(parentState: string, to: Array<string>|string)` with two arguments - from what state to be inherited and in what states can go.
+
+Properties names becomes as state names.
+```javascript
+// declare mainState, inherit from initial state, can transit to requestState
+@StateMachine.extend(StateMachine.INITIAL, ['requestState'])
+mainState: IStateDeclaration<ButtonStateMachine> = {};
+
+// declare requestState, inherit from mainState, can transit to doneState
+@StateMachine.extend('mainState', ['doneState'])
+requestState: IStateDeclaration<ButtonStateMachine> = {
+    // override initial properties
+    text: 'sending...',
+    disabled: true
+}
+
+// declare doneState, inherit from requestState, cant transit to anything - its final state
+@StateMachine.extend('requestState')
+doneState: IStateDeclaration<ButtonStateMachine> = {
+    text: 'done'
+    // no change disabled - property inherited from requestState and has `false` value
+};
+```
+> Hint: Declaration of new state should contains only changed fields relative to parent state.
+
+What is `IStateDeclaration`? It`s a optional simple type to avoid typos.
+```javascript
+export type IStateDeclaration<T> = {
+    [F in keyof T]?: T[F];
+}
+```
+
+### Declare initial transitions
+StateMachine can`t transit to random state. Transitions between states must be declared.
+You can imagine that as directed graph.
+
+After creating an instance of your machine they will be in initial state.
+To tell machine in which states we can transit from initial state we must declare getter `$next`:
+```javascript
+@StateMachine.hide // special decorator to avoid properties and methods from for..in iterator
+protected get $next(): Array<string> {
+    return ['mainState'];
+}
+```
+Ok, now we can start changing states.
+
+### Transitions between states
+To transit your machine from one state to another simply call `.transitTo(targetState: string, ...args: Array<any>): void` method of your instance.
+```
+const machine = new ButtonStateMachine();
+machine.transitTo('mainState'); // first transition from initial to main state
+machine.transitTo('requestState'); // We can transit to declared state
+```
+StateMachine restrict the transition to undescribed states:
+```
+const machine = new ButtonStateMachine();
+machine.transitTo('doneState'); // cant transit from intial to doneState
+// throw error: Navigate to doneState restircted by 'to' argument of state initial
+```
+if you try to navigate in unregistered state - machine throw error `No state '%NAME%' for navigation registered`.
+
+### onEnter and onLeave events
+StateMachine supports register callbacks to enter and leave states.
+```
+const machine = new ButtonStateMachine();
+// register callbacks
+const onEnterDoneHandler = machine.onEnter('mainState', (message) => { alert(`main! ${message}`); });
+// Add another onEnter-callback to same state
+const onOneMoreEnterDoneHandler = machine.onEnter('mainState', () => { /* do anything */ });
+const onLeaveDoneHandler = machine.onLeave('doneState, () => { alert('...'); });
+
+machine.transitTo('mainState', 'hello');
+
+// unregister callbacks
+onEnterDoneHandler();
+onLeaveDoneHandler();
+```
+Method `.transitTo` can receive many arguments which passed to onEnter callback.
+
+`onEnter` and `onLeave` methods returns functions - call them and callback will be destroyed.
+
+## How it works
+The StateMachine based on several things: metadata, descriptors, for..in iterator over object properties.
+
+Scheme:
+1. In a child-class constructor call inherited `this.rememberInitState()` method which iterate over object properties and remember them values as initial state.
+2. In a child class define protected getter calling `$next` which return array of possible states to transit in one of them from initial state.
+3. With help of special decorator `@StateMachine.extend` register new states which look like diff-objects. Decorator save them into metadata.
+4. When transition happens - we build chain of transitions from initial to target state, bring the object to initial state and one-by-one apply states from chain to them.
+5. All class methods wrapped by `@StateMachine.hide` decorator to avoid them falling into for..in cycle under the hood of StateMachine. It`s important to each transition does not override them.
 
 ## API
-- Поля состояния описывать просто как поля класса.
-- `@StateMachine.hide()` - декоратор, которым оборачивать все методы класса-потомка
-- `StateMachine.extend(parentState, to)` - объявление состояния, наследованного от parentState и с возможными переходами в to
-- `transitTo(targetState, ...args)` - переход в состояние targetState. Опционально - аргументы, которые попадут в коллбэк
-- `currentState` - название текущего состояния
-- `is(stateName)` - текущее состояние == stateName
-- `can(stateName)` - возможно-ли перейти из текущего состояния в stateName
-- `transitions()` - получить список состояний, в которые можно перейти из текущего
-- `onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void` - повесить коллбэк на вход в состояние
-- `onLeave(stateName: string, cb: () => void): () => void` - повесить коллбэк на выход из состояния
-## Пример использования
-### Описание StateMachine
-    export class ChildStateMachine extends StateMachine {
-        // Описываем начальное состояние машины
-        loading: boolean = false;
-        mainWindowVisible: boolean = false;
-        paymentWindowVisible: boolean = false;
-        successMessageVisible: boolean = false;
-        errorMessageVisible: boolean = false;
-    
-        // Описываем состояния, в которые можно пойти из начального
-        @StateMachine.hide()
-        protected get $next(): Array<string> { return ['loadingState']; }
-    
-        // Регистрация состояния loadingState, унаследованного от initial, возможно перейти в mainState
-        @StateMachine.extend('initial', ['mainState'])
-        private loadingState = {
-            loading: true
-        };
-    
-        @StateMachine.extend('initial', ['paymentState'])
-        private mainState = {
-            mainWindowVisible: true
-        };
-    
-        @StateMachine.extend('mainState', ['mainState', 'successState', 'errorState'])
-        private paymentState = {
-            paymentWindowVisible: true
-        };
-    
-        @StateMachine.extend('paymentState', ['paymentState', 'mainState'])
-        private successState = {
-            successMessageVisible: true
-        };
-    
-        @StateMachine.extend('paymentState', ['paymentState', 'mainState'])
-        private errorState = {
-            errorMessageVisible: true
-        };
-    
-        constructor() {
-            super();
-            this.rememberInitState();
-        }
-    }
-### Использование StateMachine
-    import { ChildFMS } from './child.fsm';
-    
-    // Создание экземпляра машины
-    const f = new ChildStateMachine();
-    
-    // Регистрируем коллбэк на вход в состояние paymentState
-    f.onEnter('paymentState', (paymentSum) => {
-        console.log('on enter paymentState', paymentSum);
-    });
+- `@StateMachine.hide()` - decorator for wrapping fields/methods that are not related to the state
+- `StateMachine.extend(parentState, to)` - declaring new state, inherited from parentState, possible to transit `to` states
+- `transitTo(targetState, ...args)` - transit machine to targetState. Optional - args for `onEnter` callback
+- `currentState: string` - name of current state
+- `is(stateName): boolean` - current state == stateName
+- `can(stateName): boolean` - is it possible to transit to stateName?
+- `transitions(): Array<string>` - possible transitions from current state
+- `onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void` - add onEnter callback
+- `onLeave(stateName: string, cb: () => void): () => void` - add onLeave callback
 
-    f.transitTo('loadingState');
-    console.log(f);
-    f.transitTo('mainState');
-    console.log(f);
-    // Переход в состояние с коллбэком, передаем сумму, например
-    f.transitTo('paymentState', 1000);
-    console.log(f);
-    f.transitTo('successState');
-    console.log(f.transitions());
-    f.transitTo('mainState');
-    console.log(f);
-    
-## Рекомендации
-- Не забывать описывать в своих классах-потомках конструктор и $next.
-- Делать адекватную цепочку состояний. 
-Т.к. создание состояний реализовано с помощью наследования - результат применения какого-либо состояния является цепочкой последовательных мержей предыдущих состояний на родительское состояние машины.
-Проще говоря - в initial-состоянии опишите вообще все, что может меняться в контексте состояний и задайте этому дефолтные значения, а каждое новое состояние пусть что-то меняет в предыдущем.
-- Не надо делать параллельных ветвей состояний - между ними будет неудобно переходить. См картинку https://monosnap.com/file/KcASX734C1vNcibCd0pDUgpMLymSZo
-В этом примере есть три вкладки - release, attach и remove. Так вот для каждой лучше созать свою StateMachine, чем городить такое дерево, где нарисованы далеко не все переходы.
+## Recommendations
+- dont forget to call `rememberInitState` and declare `get $next`
+- Make an adequate chain of states.
+- New state can define only changed fields relative to parent state
 
-    
-## TODO
-- Написать тесты
-- Написать examples
-- initial-состояние хранить так же как все остальные - избавиться от проверок на isInitial внутри реализации
-- Добавить в callback входа информацию о состоянии, из которого перешли
-- При сборке цепочки родительских состояний приделать проверку на циклы
+## Thanks
+The interface is peeked here:
+[JS FSM](https://github.com/jakesgordon/javascript-state-machine).
 
 ## LICENCE
 MIT

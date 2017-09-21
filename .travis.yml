@@ -4,3 +4,10 @@ node_js:
 cache:
   directories:
     - "node_modules"
+
+deploy:
+  provider: npm
+  email: "vhaldemario@gmail.com"
+  api_key: $NPM_API_KEY
+  on:
+    branch: master
