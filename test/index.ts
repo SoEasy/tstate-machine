@@ -1,7 +1,5 @@
 import { expect } from 'chai';
-import { StateMachine } from '../src/StateMachine';
-import 'reflect-metadata';
-import { IStateDeclaration } from '../src/StateDeclaration';
+import { IStateDeclaration, StateMachine } from '../src';
 
 type MachineState = IStateDeclaration<Machine>;
 

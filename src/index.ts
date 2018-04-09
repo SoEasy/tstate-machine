@@ -1,2 +1,2 @@
 export { StateMachine } from './StateMachine';
-export { IStateDeclaration } from './StateDeclaration';
+export { IStateDeclaration } from './types';
