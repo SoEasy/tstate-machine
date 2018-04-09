@@ -1,6 +1,6 @@
 # tstate-machine
 [![Build Status](https://travis-ci.org/SoEasy/tstate-machine.svg?branch=master)](https://travis-ci.org/SoEasy/tstate-machine)
-
+<img src="img/logo.svg" width="300" align="center">
 StateMachine implementation on TypeScript. Works fine with ES6
 
 ## Overview
