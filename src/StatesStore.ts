@@ -3,7 +3,10 @@ export interface IStateMetadata {
   to: Array<string>;
 }
 
-export class StateMachineMetadata {
+export class StatesStore {
+  /**
+   * Store states info by name
+   */
   private store: Record<string, IStateMetadata> = {};
 
   addState(stateName: string, parentState: string, to: string | Array<string>): void {

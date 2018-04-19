@@ -1,7 +1,7 @@
 import { merge } from './utils/merge';
 import { StateMachineInnerStore } from './StateMachineInnerStore';
 import { StateMachineStore } from './StateMachineStore';
-import { IStateMetadata } from './StateMachineMetadata';
+import { IStateMetadata } from './StatesStore';
 import { IStateMachine } from './types';
 
 /**

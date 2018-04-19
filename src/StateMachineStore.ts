@@ -1,8 +1,16 @@
-import { IStateMetadata, StateMachineMetadata } from './StateMachineMetadata';
+import { IStateMetadata, StatesStore } from './StatesStore';
 import { IStateMachine } from './types';
 
+/**
+ * Store for all registered machines in runtime and them states.
+ */
 export class StateMachineStore {
-  private static store: Map<new (...args: Array<any>) => IStateMachine, StateMachineMetadata> = new Map();
+  /**
+   * Store states by machine.
+   * Key - machine constructor
+   * Value - States store
+   */
+  private static statesByMachineStore: Map<new (...args: Array<any>) => IStateMachine, StatesStore> = new Map();
 
   static defineState(
     target: new (...args: Array<any>) => IStateMachine,
@@ -12,12 +20,12 @@ export class StateMachineStore {
   ): void {
     let metadata;
 
-    if (!this.store.has(target)) {
-      metadata = new StateMachineMetadata();
-      this.store.set(target, metadata);
+    if (!this.statesByMachineStore.has(target)) {
+      metadata = new StatesStore();
+      this.statesByMachineStore.set(target, metadata);
     }
 
-    metadata = this.store.get(target);
+    metadata = this.statesByMachineStore.get(target);
 
     metadata.addState(stateName, parentState, to);
   }
@@ -26,7 +34,7 @@ export class StateMachineStore {
     target: new (...args: Array<any>) => IStateMachine,
     stateName: string
   ): IStateMetadata {
-    const metadata: StateMachineMetadata = this.store.get(target)!;
+    const metadata: StatesStore = this.statesByMachineStore.get(target)!;
     return metadata.getState(stateName);
   }
 }
