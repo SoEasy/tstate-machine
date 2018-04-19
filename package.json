@@ -1,10 +1,11 @@
 {
   "name": "tstate-machine",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "TypeScript implementation of StateMachine",
-  "types": "index.d.ts",
+  "types": "dist/index.d.ts",
+  "main": "dist",
   "typescript": {
-    "definition": "index.d.ts"
+    "definition": "dist/index.d.ts"
   },
   "directories": {
     "test": "test"

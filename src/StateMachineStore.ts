@@ -11,6 +11,7 @@ export class StateMachineStore {
    * Value - States store
    */
   private static statesByMachineStore: Map<new (...args: Array<any>) => IStateMachine, StatesStore> = new Map();
+  private static initialKeysByMachineStore: Map<new (...args: Array<any>) => IStateMachine, Array<string>> = new Map();
 
   static defineState(
     target: new (...args: Array<any>) => IStateMachine,
@@ -36,5 +37,27 @@ export class StateMachineStore {
   ): IStateMetadata {
     const metadata: StatesStore = this.statesByMachineStore.get(target)!;
     return metadata.getState(stateName);
+  }
+
+  static defineInitialKey(
+    target: new (...args: Array<any>) => IStateMachine,
+    key: string
+  ): void {
+    let keys;
+
+    if (!this.initialKeysByMachineStore.has(target)) {
+      keys = [];
+      this.initialKeysByMachineStore.set(target, keys);
+    }
+    keys = this.initialKeysByMachineStore.get(target);
+    keys.push(key);
+  }
+
+  static getStatesForMachine(machinePrototype: new (...args: Array<any>) => IStateMachine): StatesStore {
+    return this.statesByMachineStore.get(machinePrototype)!;
+  }
+
+  static getInitialKeysForMachine(machinePrototype: new (...args: Array<any>) => IStateMachine): Array<string> {
+    return this.initialKeysByMachineStore.get(machinePrototype) || [];
   }
 }

@@ -73,11 +73,65 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 4);
+/******/ 	return __webpack_require__(__webpack_require__.s = 9);
 /******/ })
 /************************************************************************/
 /******/ ([
 /* 0 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StatesStore_1 = __webpack_require__(5);
+/**
+ * Store for all registered machines in runtime and them states.
+ */
+var StateMachineStore = (function () {
+    function StateMachineStore() {
+    }
+    StateMachineStore.defineState = function (target, stateName, parentState, to) {
+        var metadata;
+        if (!this.statesByMachineStore.has(target)) {
+            metadata = new StatesStore_1.StatesStore();
+            this.statesByMachineStore.set(target, metadata);
+        }
+        metadata = this.statesByMachineStore.get(target);
+        metadata.addState(stateName, parentState, to);
+    };
+    StateMachineStore.getState = function (target, stateName) {
+        var metadata = this.statesByMachineStore.get(target);
+        return metadata.getState(stateName);
+    };
+    StateMachineStore.defineInitialKey = function (target, key) {
+        var keys;
+        if (!this.initialKeysByMachineStore.has(target)) {
+            keys = [];
+            this.initialKeysByMachineStore.set(target, keys);
+        }
+        keys = this.initialKeysByMachineStore.get(target);
+        keys.push(key);
+    };
+    StateMachineStore.getStatesForMachine = function (machinePrototype) {
+        return this.statesByMachineStore.get(machinePrototype);
+    };
+    StateMachineStore.getInitialKeysForMachine = function (machinePrototype) {
+        return this.initialKeysByMachineStore.get(machinePrototype) || [];
+    };
+    /**
+     * Store states by machine.
+     * Key - machine constructor
+     * Value - States store
+     */
+    StateMachineStore.statesByMachineStore = new Map();
+    StateMachineStore.initialKeysByMachineStore = new Map();
+    return StateMachineStore;
+}());
+exports.StateMachineStore = StateMachineStore;
+
+
+/***/ }),
+/* 1 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -142,7 +196,7 @@ exports.merge = merge;
 
 
 /***/ }),
-/* 1 */
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -157,15 +211,16 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-var merge_1 = __webpack_require__(0);
-var StateMachineInnerStore_1 = __webpack_require__(2);
-var StateMachineMetadata_1 = __webpack_require__(3);
+var merge_1 = __webpack_require__(1);
+var StateMachineInnerStore_1 = __webpack_require__(4);
+var StateMachineStore_1 = __webpack_require__(0);
 /**
  * @description isolated store for meta-information of concrete StateMachine
  */
 var StateMachineWeakMap = new WeakMap();
 var StateMachine = (function () {
     function StateMachine() {
+        this._$next = [];
     }
     /**
      * @description static service method for generate error text about unable transit to
@@ -180,6 +235,16 @@ var StateMachine = (function () {
      * @description Static service decorator for hiding property/method in for-in
      */
     StateMachine.hide = function (_target, _key, descriptor) {
+        console.error('StateMachine.hide is deprecated. Use StateMachineDecorator($next) and StateDecorator(parent, to) instead');
+        if (descriptor) {
+            descriptor.enumerable = false;
+        }
+        else {
+            descriptor = { enumerable: false, configurable: true };
+        }
+        return descriptor;
+    };
+    StateMachine.innerHide = function (_target, _key, descriptor) {
         if (descriptor) {
             descriptor.enumerable = false;
         }
@@ -196,7 +261,10 @@ var StateMachine = (function () {
      */
     StateMachine.extend = function (parentState, to) {
         if (to === void 0) { to = []; }
-        return function (target, stateName) { return StateMachineMetadata_1.StateMachineMetadata.defineMetadata(target, stateName, parentState, to); };
+        console.error('StateMachine.extend decorator is deprecated. Use StateDecorator(parent, to) instead');
+        return function (target, stateName) {
+            return StateMachineStore_1.StateMachineStore.defineState(target, stateName, parentState, to);
+        };
     };
     Object.defineProperty(StateMachine.prototype, "$store", {
         /**
@@ -219,7 +287,11 @@ var StateMachine = (function () {
          * @description Array of states in which machine can transit from initial
          */
         get: function () {
-            return [];
+            console.error('$next is deprecated. Use StateMachineDecorator($next) instead');
+            return this._$next;
+        },
+        set: function (value) {
+            this._$next = value;
         },
         enumerable: true,
         configurable: true
@@ -238,7 +310,7 @@ var StateMachine = (function () {
      * @description Service method for get metadata for state
      */
     StateMachine.prototype.getMetadataByName = function (stateName) {
-        return StateMachineMetadata_1.StateMachineMetadata.getByName(this.selfPrototype, stateName);
+        return StateMachineStore_1.StateMachineStore.getState(this.selfPrototype, stateName);
     };
     /**
      * @description Method for transit machine to another state
@@ -303,6 +375,7 @@ var StateMachine = (function () {
      * for create a snapshot of initial state
      */
     StateMachine.prototype.rememberInitState = function () {
+        console.error('rememberInitState is deprecated. Use Initial and StateMachineDecorator($next) decorators instead');
         for (var key in this) {
             if (key !== 'constructor') {
                 this.$store.rememberInitialKey(key, this[key]);
@@ -332,7 +405,7 @@ var StateMachine = (function () {
         if (this.$store.isInitialState) {
             return this.$next.includes(stateName);
         }
-        var currentStateProps = StateMachineMetadata_1.StateMachineMetadata.getByName(this.selfPrototype, this.currentState);
+        var currentStateProps = StateMachineStore_1.StateMachineStore.getState(this.selfPrototype, this.currentState);
         return currentStateProps.to.includes(stateName);
     };
     StateMachine.prototype.transitions = function () {
@@ -344,69 +417,69 @@ var StateMachine = (function () {
      */
     StateMachine.INITIAL = 'initial';
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", StateMachineInnerStore_1.StateMachineInnerStore),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "$store", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Array),
-        __metadata("design:paramtypes", [])
+        __metadata("design:paramtypes", [Array])
     ], StateMachine.prototype, "$next", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Object),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "selfPrototype", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
-        __metadata("design:returntype", StateMachineMetadata_1.StateMachineMetadata)
+        __metadata("design:returntype", Object)
     ], StateMachine.prototype, "getMetadataByName", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Object]),
         __metadata("design:returntype", void 0)
     ], StateMachine.prototype, "transitTo", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", void 0)
     ], StateMachine.prototype, "rememberInitState", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Function]),
         __metadata("design:returntype", Function)
     ], StateMachine.prototype, "onEnter", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String, Function]),
         __metadata("design:returntype", Function)
     ], StateMachine.prototype, "onLeave", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", String),
         __metadata("design:paramtypes", [])
     ], StateMachine.prototype, "currentState", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Boolean)
     ], StateMachine.prototype, "is", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", [String]),
         __metadata("design:returntype", Boolean)
     ], StateMachine.prototype, "can", null);
     __decorate([
-        StateMachine.hide,
+        StateMachine.innerHide,
         __metadata("design:type", Function),
         __metadata("design:paramtypes", []),
         __metadata("design:returntype", Array)
@@ -417,27 +490,43 @@ exports.StateMachine = StateMachine;
 
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var merge_1 = __webpack_require__(0);
+var State_1 = __webpack_require__(7);
+exports.StateDecorator = State_1.StateDecorator;
+var StateMachine_1 = __webpack_require__(8);
+exports.StateMachineDecorator = StateMachine_1.StateMachineDecorator;
+var Initial_1 = __webpack_require__(6);
+exports.Initial = Initial_1.Initial;
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var merge_1 = __webpack_require__(1);
 /**
  * Store for inner meta-information for concrete StateMachine.
- * All methods and properties of this class used only in parent StateMachine class and no one child statemachine no access to it
+ * All methods and properties of this class used only in parent StateMachine class
+ * and no one child statemachine dosnt have access to it
  */
 var StateMachineInnerStore = (function () {
     function StateMachineInnerStore() {
         /**
-         * @description Store initial state
-         */
-        this.$initialState = {};
-        /**
          * @description name of current state
          */
         this.currentState = 'initial';
+        /**
+         * @description Store initial state
+         */
+        this.$initialState = {};
         /**
          * @description - key-value-store for onEnter callbacks
          * key - state name, value - array with callbacks
@@ -514,54 +603,124 @@ exports.StateMachineInnerStore = StateMachineInnerStore;
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var StateMachineMetadataKey = 'TStateMachineMetadata';
-/**
- * Хранилище метаданных для состояний машины. Хранит родительское состояние и названия состояний куда можно перейти
- */
-var StateMachineMetadata = (function () {
-    function StateMachineMetadata() {
+var StatesStore = (function () {
+    function StatesStore() {
+        /**
+         * Store states info by name
+         */
+        this.store = {};
     }
-    /**
-     * @description Записывает специфичные метаданные для состояния
-     * @param target - Прототип класса StateMachine
-     * @param stateName - название переменной, в которой описано состояние. По совместительству - название состояния
-     * @param parentState - состояние, от которого наследуемся
-     * @param to - массив/название состояний, в которые/которое можем перейти
-     */
-    StateMachineMetadata.defineMetadata = function (target, stateName, parentState, to) {
-        Reflect.defineMetadata(StateMachineMetadataKey, {
+    StatesStore.prototype.addState = function (stateName, parentState, to) {
+        this.store[stateName] = {
             parentState: parentState,
             to: Array.isArray(to) ? to : [to]
-        }, target, stateName);
+        };
     };
-    /**
-     * @description Получение метаданных о состоянии
-     * @param target - прототип класса StateMachine
-     * @param name - название состояния, для которого извлекаем метаданные
-     */
-    StateMachineMetadata.getByName = function (target, name) {
-        return Reflect.getMetadata(StateMachineMetadataKey, target, name);
+    StatesStore.prototype.getState = function (stateName) {
+        return this.store[stateName];
     };
-    return StateMachineMetadata;
+    return StatesStore;
 }());
-exports.StateMachineMetadata = StateMachineMetadata;
+exports.StatesStore = StatesStore;
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-var StateMachine_1 = __webpack_require__(1);
+var StateMachineStore_1 = __webpack_require__(0);
+function Initial(target, propertyKey) {
+    StateMachineStore_1.StateMachineStore.defineInitialKey(target, propertyKey);
+}
+exports.Initial = Initial;
+
+
+/***/ }),
+/* 7 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StateMachineStore_1 = __webpack_require__(0);
+function StateDecorator(parentState, to) {
+    if (to === void 0) { to = []; }
+    return function (target, stateName) {
+        StateMachineStore_1.StateMachineStore.defineState(target, stateName, parentState, to);
+    };
+}
+exports.StateDecorator = StateDecorator;
+
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StateMachineStore_1 = __webpack_require__(0);
+function StateMachineDecorator($next) {
+    if ($next === void 0) { $next = []; }
+    return function (target) {
+        // tslint:disable-next-line
+        // common code для переопределения конструктора
+        var originalConstructor = target;
+        function construct(constructor, args) {
+            // tslint:disable-next-line
+            var c = function () {
+                // tslint:disable-next-line
+                return constructor.apply(this, args);
+            };
+            c.prototype = constructor.prototype;
+            return new c();
+        }
+        // tslint:disable-next-line
+        var newConstructor = function () {
+            var args = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                args[_i] = arguments[_i];
+            }
+            var newInstance = construct(originalConstructor, args);
+            var initialKeys = StateMachineStore_1.StateMachineStore.getInitialKeysForMachine(target.prototype);
+            for (var _a = 0, initialKeys_1 = initialKeys; _a < initialKeys_1.length; _a++) {
+                var key = initialKeys_1[_a];
+                if (key !== 'constructor') {
+                    newInstance.$store.rememberInitialKey(key, newInstance[key]);
+                }
+            }
+            newInstance.$next = $next;
+            return newInstance;
+        };
+        newConstructor.prototype = originalConstructor.prototype;
+        return newConstructor;
+    };
+}
+exports.StateMachineDecorator = StateMachineDecorator;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+var StateMachine_1 = __webpack_require__(2);
 exports.StateMachine = StateMachine_1.StateMachine;
+var decorators_1 = __webpack_require__(3);
+exports.Initial = decorators_1.Initial;
+exports.StateDecorator = decorators_1.StateDecorator;
+exports.StateMachineDecorator = decorators_1.StateMachineDecorator;
 
 
 /***/ })

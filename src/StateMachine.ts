@@ -10,6 +10,7 @@ import { IStateMachine } from './types';
 const StateMachineWeakMap: WeakMap<StateMachine, StateMachineInnerStore> = new WeakMap<StateMachine, StateMachineInnerStore>();
 
 export class StateMachine implements IStateMachine {
+  private _$next: Array<string> = [];
   /**
    * @description constant to store initial state name
    * @type {string}
@@ -30,6 +31,16 @@ export class StateMachine implements IStateMachine {
    * @description Static service decorator for hiding property/method in for-in
    */
   static hide(_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor {
+    console.error('StateMachine.hide is deprecated. Use StateMachineDecorator($next) and StateDecorator(parent, to) instead');
+    if (descriptor) {
+      descriptor.enumerable = false;
+    } else {
+      descriptor = { enumerable: false, configurable: true };
+    }
+    return descriptor;
+  }
+
+  private static innerHide(_target: object, _key: string, descriptor: PropertyDescriptor): PropertyDescriptor {
     if (descriptor) {
       descriptor.enumerable = false;
     } else {
@@ -48,6 +59,7 @@ export class StateMachine implements IStateMachine {
     parentState: string,
     to: string | Array<string> = []
   ): any {
+    console.error('StateMachine.extend decorator is deprecated. Use StateDecorator(parent, to) instead');
     return (target: new (...args: Array<any>) => IStateMachine, stateName: string): void =>
       StateMachineStore.defineState(target, stateName, parentState, to);
   }
@@ -55,7 +67,7 @@ export class StateMachine implements IStateMachine {
   /**
    * @description Receive store of inner information for this instance of StateMachine
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   private get $store(): StateMachineInnerStore {
     let store: StateMachineInnerStore | undefined = StateMachineWeakMap.get(this);
     if (store) {
@@ -69,15 +81,20 @@ export class StateMachine implements IStateMachine {
   /**
    * @description Array of states in which machine can transit from initial
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   protected get $next(): Array<string> {
-    return [];
+    console.error('$next is deprecated. Use StateMachineDecorator($next) instead')
+    return this._$next;
+  }
+
+  protected set $next(value: Array<string>) {
+    this._$next = value;
   }
 
   /**
    * @description Service method for get prototype of current instance
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   private get selfPrototype(): any {
     return Object.getPrototypeOf(this);
   }
@@ -85,7 +102,7 @@ export class StateMachine implements IStateMachine {
   /**
    * @description Service method for get metadata for state
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   private getMetadataByName(stateName: string): IStateMetadata {
     return StateMachineStore.getState(this.selfPrototype, stateName);
   }
@@ -96,7 +113,7 @@ export class StateMachine implements IStateMachine {
    * @param targetState - name of state to transit
    * @param args - any data for pass to onEnter callback
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   transitTo(targetState: string, ...args: Array<any>): void {
     // Check target state is registered
     const stateToApply = targetState !== 'initial' ? this[targetState] : this.$store.initialState;
@@ -157,8 +174,9 @@ export class StateMachine implements IStateMachine {
    * @description Service method. Required to call in constructor of child-class
    * for create a snapshot of initial state
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   protected rememberInitState(): void {
+    console.error('rememberInitState is deprecated. Use Initial and StateMachineDecorator($next) decorators instead');
     for (const key in this) {
       if (key !== 'constructor') {
         this.$store.rememberInitialKey(key, this[key]);
@@ -166,12 +184,12 @@ export class StateMachine implements IStateMachine {
     }
   }
 
-  @StateMachine.hide
+  @StateMachine.innerHide
   onEnter(stateName: string, cb: (...args: Array<any>) => void): () => void {
     return this.$store.registerEnterCallback(stateName, cb);
   }
 
-  @StateMachine.hide
+  @StateMachine.innerHide
   onLeave(stateName: string, cb: () => void): () => void {
     return this.$store.registerLeaveCallback(stateName, cb);
   }
@@ -179,17 +197,17 @@ export class StateMachine implements IStateMachine {
   /**
    * @description getter for current state name
    */
-  @StateMachine.hide
+  @StateMachine.innerHide
   get currentState(): string {
     return this.$store.currentState;
   }
 
-  @StateMachine.hide
+  @StateMachine.innerHide
   is(stateName: string): boolean {
     return this.currentState === stateName;
   }
 
-  @StateMachine.hide
+  @StateMachine.innerHide
   can(stateName: string): boolean {
     if (this.$store.isInitialState) {
       return this.$next.includes(stateName);
@@ -198,7 +216,7 @@ export class StateMachine implements IStateMachine {
     return currentStateProps.to.includes(stateName);
   }
 
-  @StateMachine.hide
+  @StateMachine.innerHide
   transitions(): Array<string> {
     return this.$store.isInitialState ? this.$next : this.getMetadataByName(this.currentState).to;
   }
