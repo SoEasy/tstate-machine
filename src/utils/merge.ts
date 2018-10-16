@@ -31,6 +31,10 @@ export function merge(target: any, ...sources: Array<any>): any {
 
     if (isObject(target) && isObject(source)) {
         for (const key in source) {
+            // Only merge "own" properties
+            if (!source.hasOwnProperty(key)) {
+                continue;
+            }            
             if (isObject(source[key])) {
                 if (!target[key]) {
                     Object.assign(target, { [key]: {} });
