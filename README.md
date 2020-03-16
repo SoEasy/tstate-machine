@@ -17,7 +17,7 @@ class ButtonStateMachine extends StateMachine {
 
     // state declarations
     // From what state we inherit and in what states we can transit
-    @StateMachine.extend(StateMachine.INTIAL, ['requestState'])
+    @StateMachine.extend(StateMachine.INITIAL, ['requestState'])
     mainState: IStateDeclaration<ButtonStateMachine> = {}; // no changes relative to parent(initial) state
 
     @StateMachine.extend('mainState', ['doneState'])
@@ -118,7 +118,7 @@ doneState: IStateDeclaration<ButtonStateMachine> = {
 ```
 > Hint: Declaration of new state should contains only changed fields relative to parent state.
 
-What is `IStateDeclaration`? It`s a optional simple type to avoid typos.
+What is `IStateDeclaration`? It's a optional simple type to avoid typos.
 ```javascript
 export type IStateDeclaration<T> = {
     [F in keyof T]?: T[F];
@@ -126,7 +126,7 @@ export type IStateDeclaration<T> = {
 ```
 
 ### Declare initial transitions
-StateMachine can`t transit to random state. Transitions between states must be declared.
+StateMachine can't transit to random state. Transitions between states must be declared.
 You can imagine that as directed graph.
 
 After creating an instance of your machine they will be in initial state.
